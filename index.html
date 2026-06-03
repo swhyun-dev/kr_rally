@@ -1226,6 +1226,84 @@
       z-index: 1
     }
 
+    /* 첫 방문 환영 팝업 */
+    .welcm[hidden] { display: none }
+    .welcm {
+      position: fixed; inset: 0; z-index: 300;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px
+    }
+    .welcm .wbk {
+      position: absolute; inset: 0;
+      background: rgba(0, 0, 0, .88);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      animation: wfade .3s ease-out
+    }
+    .welcm .wbox {
+      position: relative;
+      background: linear-gradient(160deg, #1a0608, #2a0a0d);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 32px 24px 22px;
+      max-width: 360px; width: 100%;
+      box-shadow: 0 24px 60px rgba(255, 32, 48, .45), 0 0 80px rgba(255, 32, 48, .25);
+      text-align: center;
+      animation: wpop .4s cubic-bezier(.34, 1.56, .64, 1)
+    }
+    @keyframes wfade { 0% { opacity: 0 } 100% { opacity: 1 } }
+    @keyframes wpop {
+      0% { opacity: 0; transform: scale(.85) translateY(20px) }
+      100% { opacity: 1; transform: scale(1) translateY(0) }
+    }
+    .welcm .wclose {
+      position: absolute; top: 12px; right: 12px;
+      background: transparent; border: 0; color: var(--sub);
+      font-size: 24px; cursor: pointer; padding: 4px 10px;
+      font-weight: 900; line-height: 1; font-family: inherit
+    }
+    .welcm .wclose:hover { color: #fff }
+    .welcm .wtag {
+      display: inline-block; background: var(--accent); color: #fff;
+      font-size: 11.5px; font-weight: 900; padding: 6px 13px;
+      border-radius: 8px; letter-spacing: 1.5px; margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(255, 32, 48, .5)
+    }
+    .welcm .wtitle {
+      font-size: 26px; font-weight: 900; color: #fff;
+      letter-spacing: -.8px; margin-bottom: 10px; line-height: 1.25
+    }
+    .welcm .wtitle .em { color: var(--accent); text-shadow: 0 0 20px rgba(255, 32, 48, .7) }
+    .welcm .wdesc {
+      font-size: 14.5px; color: var(--sub); line-height: 1.65;
+      margin-bottom: 22px
+    }
+    .welcm .wdesc b { color: var(--gold); font-weight: 900 }
+    .welcm .wbtn {
+      width: 100%; padding: 16px; background: var(--accent); color: #fff;
+      border: 0; border-radius: 12px; font-size: 15.5px; font-weight: 900;
+      cursor: pointer; transition: filter .15s, transform .12s;
+      box-shadow: 0 10px 28px rgba(255, 32, 48, .55);
+      letter-spacing: -.3px; font-family: inherit
+    }
+    .welcm .wbtn:hover { filter: brightness(1.1) }
+    .welcm .wbtn:active { transform: scale(.97) }
+    .welcm .wurl {
+      font-size: 13px; color: var(--gold); font-weight: 800;
+      margin: 14px 0 14px;
+      letter-spacing: .3px;
+      background: rgba(255, 213, 74, .1);
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 213, 74, .25)
+    }
+    .welcm .wskip {
+      width: 100%; padding: 11px; background: transparent;
+      color: var(--sub); border: 1px solid var(--line);
+      border-radius: 10px; font-weight: 700; cursor: pointer;
+      font-size: 13px; font-family: inherit
+    }
+    .welcm .wskip:hover { color: #fff }
+
     /* 길찾기 모달 */
     .modal[hidden] {
       display: none
@@ -1549,6 +1627,23 @@
     <button class="go" onclick="openNav()">참여 →</button>
   </div>
 
+  <!-- 첫 방문 환영 팝업 -->
+  <div class="welcm" id="welcomeModal" hidden>
+    <div class="wbk" onclick="closeWelcome()"></div>
+    <div class="wbox">
+      <button class="wclose" onclick="closeWelcome()" aria-label="닫기">✕</button>
+      <span class="wtag">📢 함께 알려주세요</span>
+      <div class="wtitle">지금이 <span class="em">그 순간</span>입니다</div>
+      <div class="wdesc">
+        <b>한 명이라도 더</b> 함께해야 합니다.<br />
+        주변에 이 사실을 알려주세요.
+      </div>
+      <button class="wbtn" onclick="shareFromWelcome()">🔗 링크 복사 — 단톡에 퍼뜨리기</button>
+      <div class="wurl">resetkr0603.com</div>
+      <button class="wskip" onclick="closeWelcome()">닫고 페이지 보기</button>
+    </div>
+  </div>
+
   <!-- 길찾기 모달 -->
   <div class="modal" id="navModal" hidden>
     <div class="mbk" onclick="closeNav()"></div>
@@ -1587,13 +1682,34 @@
       });
     }
 
+    /* 첫 방문 환영 팝업 */
+    function openWelcome() { document.getElementById('welcomeModal').removeAttribute('hidden'); }
+    function closeWelcome() { document.getElementById('welcomeModal').setAttribute('hidden', ''); }
+    function shareFromWelcome() {
+      navigator.clipboard.writeText('https://resetkr0603.com').then(function () {
+        alert('✅ 링크가 복사되었습니다!\n단톡방·SNS·문자에 붙여넣어 주세요. 🙌');
+        closeWelcome();
+      }).catch(function () {
+        alert('복사 실패. 주소창에서 직접 복사해주세요: resetkr0603.com');
+      });
+    }
+    /* 처음 들어왔을 때만 자동 표시 */
+    setTimeout(function () {
+      try {
+        if (!localStorage.getItem('welcomeSeen')) {
+          openWelcome();
+          localStorage.setItem('welcomeSeen', '1');
+        }
+      } catch (e) { /* localStorage 차단 환경 */ }
+    }, 700);
+
     /* 길찾기 모달 */
     function openNav() { document.getElementById('navModal').removeAttribute('hidden'); }
     function closeNav() { document.getElementById('navModal').setAttribute('hidden', ''); }
 
     /* ESC 키로 모달 닫기 */
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeNav();
+      if (e.key === 'Escape') { closeNav(); closeWelcome(); }
     });
   </script>
 

@@ -828,21 +828,17 @@
         transform: none
       }
     }
-    /* 태극기 (히어로 중앙 큰 워터마크) */
+    /* 태극기 (히어로 중앙 큰 고정 워터마크) */
     .hero { position: relative }
     .hero .flag {
       position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      width: 280px; height: auto; z-index: 0; opacity: .35;
+      width: 360px; height: auto; max-width: 90%;
+      z-index: 0; opacity: .45;
       pointer-events: none;
-      filter: drop-shadow(0 8px 24px rgba(255, 32, 48, .5));
-      animation: flagwave 3.5s ease-in-out infinite
+      filter: drop-shadow(0 10px 28px rgba(255, 32, 48, .6))
     }
     .hero .tag, .hero h1, .hero .lead { position: relative; z-index: 1 }
-    @keyframes flagwave {
-      0%, 100% { transform: translate(-50%, -50%) rotate(-4deg) scale(1) }
-      50% { transform: translate(-50%, -52%) rotate(4deg) scale(1.04) }
-    }
 
     /* megabox 태극기 (배경 워터마크) */
     .megabox .flag-bg {

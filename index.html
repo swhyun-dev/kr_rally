@@ -851,6 +851,58 @@
       flex: 0 0 auto
     }
 
+    /* === 실시간 방송 (유튜브 라이브) === */
+    .livetv {
+      margin-top: 4px
+    }
+    .livetv .lvbox {
+      position: relative;
+      aspect-ratio: 16/9;
+      background: #000;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid var(--accent);
+      box-shadow: 0 10px 30px rgba(255, 32, 48, .3)
+    }
+    .livetv .lvbox::before {
+      content: "🔴 LIVE";
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 2;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 4px 9px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, .5);
+      pointer-events: none
+    }
+    .livetv .lvbox iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block
+    }
+    .livetv .lvch {
+      display: block;
+      text-align: center;
+      background: rgba(255, 32, 48, .12);
+      color: var(--accent);
+      padding: 11px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 32, 48, .35);
+      margin-top: 10px;
+      font-weight: 800;
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: -.2px;
+      transition: filter .15s
+    }
+    .livetv .lvch:hover { filter: brightness(1.15) }
+
     /* === 실시간 채팅 === */
     .chat {
       background: var(--card);
@@ -1392,6 +1444,23 @@
         <button class="btn primary" onclick="openNav()">✊ 참여한다 / 길찾기 시작</button>
         <a class="btn gold" href="https://map.kakao.com/link/to/중앙선거관리위원회,37.4286,126.9990" target="_blank" rel="noopener">🚌 교통편 (카카오맵 길찾기)</a>
         <button class="btn outline" onclick="copyLink()">🔗 링크 복사 (단톡·SNS에 공유)</button>
+      </div>
+    </section>
+
+    <!-- 실시간 방송 (보수 대표 채널 라이브) -->
+    <section class="section">
+      <h2 class="reveal">📺 <span class="em">실시간</span> 방송</h2>
+      <p class="lead reveal" style="--delay:.06s">보수 대표 채널 <b style="color:var(--gold)">@1waynews-jhg</b> 현장 생중계</p>
+      <div class="livetv reveal" style="--delay:.05s">
+        <div class="lvbox">
+          <iframe src="https://www.youtube.com/embed/live_stream?channel=UC75fFr-vRB-iya__9SCpmIQ"
+            title="보수 대표 채널 실시간 방송"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <a class="lvch" href="https://www.youtube.com/@1waynews-jhg" target="_blank" rel="noopener">
+          📺 방송이 안 뜨면 — 유튜브 채널 바로가기 ↗
+        </a>
       </div>
     </section>
 

@@ -129,7 +129,7 @@
       z-index: 1001;
       background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent), var(--gold), var(--accent));
       background-size: 300% 100%;
-      animation: edgemove .9s linear infinite, edgeblink .35s steps(2) infinite
+      animation: edgemove 2s linear infinite
     }
 
     body::after {
@@ -142,7 +142,7 @@
       z-index: 1001;
       background: linear-gradient(90deg, var(--gold), var(--accent), var(--gold), var(--accent), var(--gold));
       background-size: 300% 100%;
-      animation: edgemove .9s linear infinite reverse, edgeblink .35s steps(2) infinite
+      animation: edgemove 2s linear infinite reverse
     }
 
     @keyframes edgemove {
@@ -174,24 +174,18 @@
       pointer-events: none;
       z-index: 998;
       mix-blend-mode: screen;
-      animation: sirenflash 3.2s ease-in-out infinite
+      animation: sirenflash 8s ease-in-out infinite
     }
 
     @keyframes sirenflash {
 
       0%,
-      84%,
+      94%,
       100% {
         opacity: 0
       }
 
-      87%,
-      90% {
-        opacity: .18
-      }
-
-      88%,
-      92% {
+      97% {
         opacity: .06
       }
     }
@@ -206,7 +200,7 @@
           var(--accent) 0, var(--accent) 22px,
           var(--gold) 22px, var(--gold) 44px);
       background-size: 62.2px 62.2px;
-      animation: sirenmove .65s linear infinite;
+      animation: sirenmove 1.6s linear infinite;
       border-top: 2px solid var(--accent-deep);
       border-bottom: 2px solid var(--accent-deep)
     }
@@ -219,7 +213,7 @@
       font-size: 13.5px;
       font-weight: 900;
       letter-spacing: 1px;
-      animation: innerblink .55s steps(2, end) infinite
+      animation: innerblink 2.5s ease-in-out infinite
     }
 
     @keyframes sirenmove {
@@ -252,7 +246,7 @@
       border-radius: 50%;
       margin-right: 8px;
       vertical-align: 1px;
-      animation: pulse .55s ease-in-out infinite;
+      animation: pulse 1.6s ease-in-out infinite;
       box-shadow: 0 0 10px #fff, 0 0 20px var(--gold)
     }
 
@@ -266,7 +260,7 @@
       letter-spacing: 2px;
       margin-right: 8px;
       vertical-align: 1px;
-      animation: liveflick .25s steps(2) infinite;
+      animation: liveflick 1.4s ease-in-out infinite;
       font-weight: 900
     }
 
@@ -300,7 +294,7 @@
       letter-spacing: 2px;
       margin-bottom: 18px;
       border: 1px solid rgba(255, 213, 74, .35);
-      animation: tagblink 1s steps(2) infinite
+      animation: tagblink 2.5s ease-in-out infinite
     }
 
     @keyframes tagblink {
@@ -321,7 +315,7 @@
       letter-spacing: -1.5px;
       line-height: 1.1;
       color: #fff;
-      animation: textpulse 1.3s ease-in-out infinite
+      animation: textpulse 3s ease-in-out infinite
     }
 
     @keyframes textpulse {
@@ -339,7 +333,7 @@
     .hero h1 .em {
       color: var(--accent);
       display: inline-block;
-      animation: empulse 1.1s ease-in-out infinite
+      animation: empulse 2.5s ease-in-out infinite
     }
 
     @keyframes empulse {
@@ -369,7 +363,7 @@
     .hero .lead b {
       color: var(--gold);
       font-weight: 900;
-      animation: goldblink .7s steps(2) infinite
+      animation: goldblink 2s ease-in-out infinite
     }
 
     @keyframes goldblink {
@@ -505,7 +499,7 @@
     .callout .cq .em {
       color: var(--accent);
       text-shadow: 0 0 28px var(--accent);
-      animation: empulse 1.1s ease-in-out infinite
+      animation: empulse 2.5s ease-in-out infinite
     }
     @keyframes empulse {
       0%, 100% { opacity: 1 }
@@ -1086,17 +1080,24 @@
       color: var(--accent)
     }
 
-    .sticky a.go {
+    .sticky .go {
       background: var(--accent);
       color: #fff;
-      padding: 10px 16px;
-      border-radius: 9px;
+      padding: 11px 18px;
+      border-radius: 10px;
+      border: 0;
       font-weight: 900;
-      font-size: 13px;
+      font-size: 13.5px;
       text-decoration: none;
       flex: 0 0 auto;
-      letter-spacing: -.3px
+      letter-spacing: -.3px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255, 32, 48, .5);
+      transition: filter .15s, transform .1s;
+      font-family: inherit
     }
+    .sticky .go:hover { filter: brightness(1.1) }
+    .sticky .go:active { transform: scale(.96) }
 
     @media (prefers-reduced-motion:reduce) {
       * {

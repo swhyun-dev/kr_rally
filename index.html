@@ -807,8 +807,28 @@
       border-radius: 50%;
       animation: pulse 1s ease-in-out infinite
     }
-    .chat .chead .ucnt {
+    .chat .chead .cstats {
       margin-left: auto;
+      display: flex;
+      gap: 6px;
+      align-items: center
+    }
+    .chat .chead .online {
+      font-size: 12px;
+      background: rgba(34, 197, 94, .25);
+      color: #4ade80;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-weight: 900;
+      border: 1px solid rgba(74, 222, 128, .35);
+      letter-spacing: -.2px;
+      animation: onlinepulse 2s ease-in-out infinite
+    }
+    @keyframes onlinepulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, .4) }
+      50% { box-shadow: 0 0 0 6px rgba(74, 222, 128, 0) }
+    }
+    .chat .chead .ucnt {
       font-size: 12px;
       background: rgba(0, 0, 0, .4);
       padding: 3px 9px;
@@ -1287,7 +1307,10 @@
         <div class="chead">
           <span class="ldot"></span>
           <span>LIVE 채팅</span>
-          <span class="ucnt" id="ccount">연결 중</span>
+          <span class="cstats">
+            <span class="online" id="conline">🟢 - 명</span>
+            <span class="ucnt" id="ccount">💬 0</span>
+          </span>
         </div>
         <div class="cmsgs" id="cmsgs">
           <div class="cloading">⚡ 연결 중...</div>
@@ -1385,7 +1408,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getDatabase, ref, push, query, limitToLast, onChildAdded, serverTimestamp, onValue, orderByChild } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, ref, push, set, remove, onDisconnect, query, limitToLast, onChildAdded, serverTimestamp, onValue, orderByChild } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -1406,7 +1429,36 @@
 
     let myUid = null;
     signInAnonymously(auth).catch(e => console.warn('익명 로그인 실패', e));
-    onAuthStateChanged(auth, u => { if (u) myUid = u.uid; });
+    onAuthStateChanged(auth, u => {
+      if (u) {
+        myUid = u.uid;
+        setupPresence(u.uid);
+      }
+    });
+
+    /* 실시간 접속자 추적 (Firebase Presence) */
+    function setupPresence(uid) {
+      const myPresenceRef = ref(db, `presence/${uid}`);
+      const connectedRef = ref(db, '.info/connected');
+      onValue(connectedRef, snap => {
+        if (snap.val() === true) {
+          /* 연결이 끊기면 자동으로 노드 제거 */
+          onDisconnect(myPresenceRef).remove();
+          set(myPresenceRef, { lastSeen: serverTimestamp() });
+        }
+      });
+
+      /* 전체 접속자 수 실시간 표시 */
+      const allPresenceRef = ref(db, 'presence');
+      const onlineEl = document.getElementById('conline');
+      onValue(allPresenceRef, snap => {
+        const n = snap.size || 0;
+        if (onlineEl) onlineEl.textContent = `🟢 ${n.toLocaleString('ko-KR')}명 접속`;
+      }, err => {
+        console.warn('접속자 수 불러오기 실패', err);
+        if (onlineEl) onlineEl.textContent = '🟢 LIVE';
+      });
+    }
 
     /* 한글 욕설 클라이언트 필터 (기본 리스트) */
     const blocked = ['시발', '씨발', 'ㅅㅂ', '병신', 'ㅂㅅ', '개새', '개색', '좆', '미친', '닥쳐', '꺼져', '죽어', '지랄', 'ㅈㄹ', '존나', 'ㅈㄴ', '빨아', '꼴려', '새끼', 'ㅅㄲ'];
@@ -1450,8 +1502,8 @@
 
       const loading = msgsEl.querySelector('.cloading');
       if (loading) loading.remove();
-      if (!connected) { connected = true; countEl.textContent = `메시지 ${count}`; }
-      else countEl.textContent = `메시지 ${count}`;
+      if (!connected) { connected = true; countEl.textContent = `💬 ${count}`; }
+      else countEl.textContent = `💬 ${count}`;
 
       const nearBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 180;
       if (firstLoad || nearBottom) msgsEl.scrollTop = msgsEl.scrollHeight;
@@ -1466,7 +1518,7 @@
       if (count === 0) {
         const loading = msgsEl.querySelector('.cloading');
         if (loading) loading.innerHTML = '💬 첫 메시지를 남겨주세요!<br /><span style="font-size:11px;color:#666">현장 소식 · 응원 · 인증샷 텍스트 등</span>';
-        countEl.textContent = '메시지 0';
+        countEl.textContent = '💬 0';
       }
     }, 5000);
 

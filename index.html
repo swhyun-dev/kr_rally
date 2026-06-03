@@ -1202,6 +1202,11 @@
       sticky.classList.toggle('show', show);
     }, { passive: true });
 
+    /* 숨겨진 방문 카운터 (관리자 전용 — 페이지에 표시되지 않음) */
+    (function () {
+      try { fetch('https://api.counterapi.dev/v1/resetkr0603-stats-8309c3414e/visits/up').catch(function () { }); } catch (e) { }
+    })();
+
     /* 링크 복사 */
     function copyLink() {
       navigator.clipboard.writeText(location.href).then(function () {

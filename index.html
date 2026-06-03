@@ -780,6 +780,158 @@
       flex: 0 0 auto
     }
 
+    /* === 실시간 채팅 === */
+    .chat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      margin-top: 4px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .4)
+    }
+    .chat .chead {
+      padding: 14px 18px;
+      background: linear-gradient(90deg, var(--accent-deep), var(--accent));
+      color: #fff;
+      font-weight: 900;
+      font-size: 14.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: .3px
+    }
+    .chat .chead .ldot {
+      width: 9px;
+      height: 9px;
+      background: #fff;
+      border-radius: 50%;
+      animation: pulse 1s ease-in-out infinite
+    }
+    .chat .chead .ucnt {
+      margin-left: auto;
+      font-size: 12px;
+      background: rgba(0, 0, 0, .4);
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-weight: 800
+    }
+    .chat .cmsgs {
+      height: 360px;
+      overflow-y: auto;
+      padding: 14px;
+      background: #0a0505;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-deep) transparent
+    }
+    .chat .cmsgs::-webkit-scrollbar {
+      width: 6px
+    }
+    .chat .cmsgs::-webkit-scrollbar-thumb {
+      background: var(--accent-deep);
+      border-radius: 3px
+    }
+    .chat .cmsg {
+      background: rgba(255, 255, 255, .04);
+      border-radius: 10px;
+      padding: 9px 12px;
+      border-left: 2px solid var(--accent);
+      animation: msgIn .25s ease-out
+    }
+    @keyframes msgIn {
+      0% { opacity: 0; transform: translateY(8px) }
+      100% { opacity: 1; transform: none }
+    }
+    .chat .cmsg.me {
+      border-left-color: var(--gold);
+      background: rgba(255, 213, 74, .06)
+    }
+    .chat .cmsg .cn {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--accent);
+      margin-right: 6px
+    }
+    .chat .cmsg.me .cn { color: var(--gold) }
+    .chat .cmsg .ct {
+      font-size: 14px;
+      color: #fff;
+      word-break: break-word;
+      line-height: 1.45
+    }
+    .chat .cmsg .ctime {
+      font-size: 10.5px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 600
+    }
+    .chat .cloading {
+      text-align: center;
+      color: var(--muted);
+      padding: 60px 20px;
+      font-size: 13px;
+      margin: auto
+    }
+    .chat .cinput {
+      padding: 12px 14px;
+      background: var(--card);
+      border-top: 1px solid var(--line)
+    }
+    .chat .cname {
+      width: 100%;
+      padding: 9px 12px;
+      background: #0a0505;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      outline: none
+    }
+    .chat .cname:focus, .chat .ctext:focus { border-color: var(--accent) }
+    .chat .cinrow {
+      display: flex;
+      gap: 8px
+    }
+    .chat .ctext {
+      flex: 1;
+      padding: 11px 12px;
+      background: #0a0505;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      outline: none;
+      min-width: 0
+    }
+    .chat .csend {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-weight: 900;
+      cursor: pointer;
+      font-size: 14px;
+      flex: 0 0 auto;
+      transition: filter .15s
+    }
+    .chat .csend:hover { filter: brightness(1.1) }
+    .chat .csend:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+    .chat .cnotice {
+      font-size: 10.5px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 10px;
+      line-height: 1.55
+    }
+
     /* 푸터 */
     footer {
       margin-top: 36px;
@@ -1131,17 +1283,25 @@
       <h2 class="reveal">📡 <span class="em">실시간</span> 피드</h2>
       <p class="lead reveal" style="--delay:.06s">현장 소식·인증샷·응원 메시지가 실시간으로 올라옵니다.</p>
 
-      <div class="feed reveal" style="--delay:.05s">
-        <div class="fhead">
+      <div class="chat reveal" style="--delay:.05s">
+        <div class="chead">
           <span class="ldot"></span>
           <span>LIVE 채팅</span>
-          <span class="lcount">곧 시작</span>
+          <span class="ucnt" id="ccount">연결 중</span>
         </div>
-        <div class="fbody">
-          <div class="icon">⚡</div>
-          <div class="ftitle">실시간 피드 준비 중</div>
-          <div class="fdesc">현장에서 누구나 메시지를 남길 수 있는<br />실시간 채팅 공간을 곧 오픈합니다.</div>
-          <div class="fcountdown">🔧 시스템 점검 중</div>
+        <div class="cmsgs" id="cmsgs">
+          <div class="cloading">⚡ 연결 중...</div>
+        </div>
+        <div class="cinput">
+          <input class="cname" id="cname" type="text" placeholder="닉네임 (최대 12자)" maxlength="12" />
+          <div class="cinrow">
+            <input class="ctext" id="ctext" type="text" placeholder="현장 소식·응원 메시지 (200자)" maxlength="200" />
+            <button class="csend" id="csend" type="button">전송</button>
+          </div>
+          <div class="cnotice">
+            ※ 게시물은 작성자 본인 책임이며, 운영자가 부적절한 게시물을 즉시 삭제할 수 있습니다.<br />
+            욕설·혐오·허위정보·개인정보 게시 금지 · 5초당 1개 메시지 제한
+          </div>
         </div>
       </div>
     </section>
@@ -1218,6 +1378,137 @@
     /* ESC 키로 모달 닫기 */
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeNav();
+    });
+  </script>
+
+  <!-- Firebase 실시간 채팅 -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getDatabase, ref, push, query, limitToLast, onChildAdded, serverTimestamp, onValue, orderByChild } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA1CP6WuBXFvQz3xRSsUS2fq3O3C8TYMQ4",
+      authDomain: "resetkr0603.firebaseapp.com",
+      databaseURL: "https://resetkr0603-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "resetkr0603",
+      storageBucket: "resetkr0603.firebasestorage.app",
+      messagingSenderId: "123745824392",
+      appId: "1:123745824392:web:8608c8f6a788b1ee6ab93d",
+      measurementId: "G-ZH2K1SDTRB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    try { getAnalytics(app); } catch (e) { console.warn('Analytics init skipped', e); }
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let myUid = null;
+    signInAnonymously(auth).catch(e => console.warn('익명 로그인 실패', e));
+    onAuthStateChanged(auth, u => { if (u) myUid = u.uid; });
+
+    /* 한글 욕설 클라이언트 필터 (기본 리스트) */
+    const blocked = ['시발', '씨발', 'ㅅㅂ', '병신', 'ㅂㅅ', '개새', '개색', '좆', '미친', '닥쳐', '꺼져', '죽어', '지랄', 'ㅈㄹ', '존나', 'ㅈㄴ', '빨아', '꼴려', '새끼', 'ㅅㄲ'];
+    function hasBlock(s) {
+      const lower = (s || '').toLowerCase().replace(/\s/g, '');
+      return blocked.some(w => lower.includes(w.toLowerCase()));
+    }
+
+    const msgsEl = document.getElementById('cmsgs');
+    const nameEl = document.getElementById('cname');
+    const textEl = document.getElementById('ctext');
+    const sendEl = document.getElementById('csend');
+    const countEl = document.getElementById('ccount');
+
+    nameEl.value = localStorage.getItem('chatName') || '';
+
+    function esc(s) {
+      return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[c]));
+    }
+    function fmtTime(ts) {
+      if (!ts) return '';
+      const d = new Date(ts);
+      const h = d.getHours().toString().padStart(2, '0');
+      const m = d.getMinutes().toString().padStart(2, '0');
+      return `${h}:${m}`;
+    }
+
+    let firstLoad = true;
+    let count = 0;
+    setTimeout(() => { firstLoad = false; }, 1500);
+
+    const msgsRef = query(ref(db, 'messages'), limitToLast(100));
+    let connected = false;
+    onChildAdded(msgsRef, snap => {
+      const data = snap.val() || {};
+      const div = document.createElement('div');
+      div.className = 'cmsg' + (data.uid && data.uid === myUid ? ' me' : '');
+      div.innerHTML = `<div><span class="cn">${esc(data.name || '익명')}</span><span class="ct">${esc(data.text || '')}</span></div><div class="ctime">${fmtTime(data.time)}</div>`;
+      msgsEl.appendChild(div);
+      count++;
+
+      const loading = msgsEl.querySelector('.cloading');
+      if (loading) loading.remove();
+      if (!connected) { connected = true; countEl.textContent = `메시지 ${count}`; }
+      else countEl.textContent = `메시지 ${count}`;
+
+      const nearBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 180;
+      if (firstLoad || nearBottom) msgsEl.scrollTop = msgsEl.scrollHeight;
+    }, err => {
+      console.error('채팅 불러오기 실패', err);
+      const loading = msgsEl.querySelector('.cloading');
+      if (loading) loading.textContent = '⚠️ 채팅 연결 실패. 잠시 후 새로고침 해주세요.';
+    });
+
+    /* 빈 상태 표시 (5초 후 메시지 없으면) */
+    setTimeout(() => {
+      if (count === 0) {
+        const loading = msgsEl.querySelector('.cloading');
+        if (loading) loading.innerHTML = '💬 첫 메시지를 남겨주세요!<br /><span style="font-size:11px;color:#666">현장 소식 · 응원 · 인증샷 텍스트 등</span>';
+        countEl.textContent = '메시지 0';
+      }
+    }, 5000);
+
+    let lastSent = 0;
+    let lastText = '';
+    async function send() {
+      const name = (nameEl.value || '').trim() || '익명';
+      const text = (textEl.value || '').trim();
+      if (!text) return;
+      if (text.length > 200) { alert('200자까지만 가능합니다.'); return; }
+      if (hasBlock(text) || hasBlock(name)) { alert('부적절한 단어가 포함되어 있어요.'); return; }
+
+      const now = Date.now();
+      if (now - lastSent < 5000) {
+        alert(`도배 방지 — ${Math.ceil((5000 - (now - lastSent)) / 1000)}초 후 다시 시도해주세요.`);
+        return;
+      }
+      if (text === lastText && now - lastSent < 30000) { alert('같은 메시지를 반복 전송할 수 없어요.'); return; }
+
+      sendEl.disabled = true;
+      try {
+        await push(ref(db, 'messages'), {
+          name: name.slice(0, 12),
+          text,
+          time: serverTimestamp(),
+          uid: myUid || 'anon'
+        });
+        localStorage.setItem('chatName', name);
+        lastSent = now;
+        lastText = text;
+        textEl.value = '';
+      } catch (e) {
+        console.error(e);
+        alert('전송 실패. 잠시 후 다시 시도해주세요.\n' + (e.message || ''));
+      } finally {
+        sendEl.disabled = false;
+        textEl.focus();
+      }
+    }
+    sendEl.addEventListener('click', send);
+    textEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
   </script>
 </body>

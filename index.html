@@ -2736,7 +2736,7 @@
     </section>
 
     <footer>
-      <div style="margin-top:6px">본 페이지는 정보 공유 목적이며, 게재된 내용은 출처를 명시합니다.</div>
+      <div style="margin-top:6px">본 페이지는 정보 공유 목적이며, 게재된 내용은 출처를 명시합니다. <a href="#" id="adminLink" style="opacity:.4;font-size:10px;color:var(--sub);margin-left:6px;text-decoration:none">🛡️</a></div>
     </footer>
 
   </div>
@@ -3405,9 +3405,17 @@
     /* 페이지 로드 시 키가 있으면 자동 시작 */
     setTimeout(() => { if (myUid) ytStartAuto(); else setTimeout(ytStartAuto, 2000); }, 1500);
 
-    /* === 운영자 패널 (임시 토큰 기반 · 곧 Firebase Auth로 교체 예정) === */
-    if (new URLSearchParams(location.search).get('op') === 'xK9mP3qN7wLv5J8R') {
+    /* === 운영자 패널 (Firebase Auth UID 기반) === */
+    const ADMIN_UID = 'w0Yry10zLbXwHzFtbWcIR7EyCA82';
+    function isAdminUser() {
+      return auth.currentUser && auth.currentUser.uid === ADMIN_UID;
+    }
+    let adminPanelEl = null;
+
+    function openAdminPanel() {
+      if (adminPanelEl) return;
       const adminBox = document.createElement('div');
+      adminPanelEl = adminBox;
       adminBox.className = 'live-admin';
       adminBox.innerHTML = `
         <h4>🛡️ 운영자 패널</h4>
@@ -3421,13 +3429,18 @@
           </button>
           <button type="button" class="la-logout-btn" id="laGoogleLogout" hidden>로그아웃 (익명으로 돌아감)</button>
           <div class="la-uid-box" id="laUidBox" hidden>
-            <div class="la-uid-label">📌 내 UID (운영자 권한 등록용)</div>
+            <div class="la-uid-label">📌 내 UID</div>
             <code class="la-uid-val" id="laUid"></code>
             <button type="button" class="la-copy-btn" id="laCopyUid">📋 UID 복사</button>
           </div>
         </div>
 
-        <div class="la-api la-section">
+        <div class="la-no-perm la-section" id="laNoPerm" hidden style="text-align:center;color:var(--accent);font-size:12px;padding:10px;background:rgba(255,32,48,.06);border:1px solid rgba(255,32,48,.2);border-radius:8px">
+          🚫 운영자 권한이 없습니다.<br>
+          <span style="color:var(--sub);font-size:11px">위 UID를 운영자에게 전달하면 권한을 받을 수 있어요.</span>
+        </div>
+
+        <div class="la-api la-section la-admin-only">
           <div class="la-h">🤖 자동 감지 (YouTube API)</div>
           <input type="password" id="laApiKey" placeholder="API 키 입력 (Google Cloud)" autocomplete="off" />
           <div class="la-buttons">
@@ -3437,7 +3450,7 @@
           <div class="la-status" id="laApiStatus">⚫ 미설정</div>
         </div>
 
-        <div class="la-manual la-section">
+        <div class="la-manual la-section la-admin-only">
           <div class="la-h">✋ 수동 토글 (오버라이드)</div>
           <div class="la-list">
             ${LIVE_CHANNELS.map(c => `
@@ -3615,7 +3628,43 @@
 
       adminBox.querySelector('.la-close').addEventListener('click', () => {
         adminBox.remove();
+        adminPanelEl = null;
       });
+
+      /* === Admin 권한에 따라 섹션 표시/숨김 === */
+      function applyAdminGates() {
+        const isAdmin = isAdminUser();
+        const u = auth.currentUser;
+        const loggedInNonAdmin = u && !u.isAnonymous && !isAdmin;
+        adminBox.querySelectorAll('.la-admin-only').forEach(el => {
+          el.style.display = isAdmin ? '' : 'none';
+        });
+        const noPermEl = adminBox.querySelector('#laNoPerm');
+        if (noPermEl) noPermEl.hidden = !loggedInNonAdmin;
+      }
+      applyAdminGates();
+      onAuthStateChanged(auth, applyAdminGates);
+    }
+
+    /* 푸터 운영자 링크 → 패널 열기 */
+    document.addEventListener('DOMContentLoaded', () => {
+      const adminLink = document.getElementById('adminLink');
+      if (adminLink) {
+        adminLink.addEventListener('click', e => {
+          e.preventDefault();
+          openAdminPanel();
+        });
+      }
+    });
+    /* DOM 이미 로드되어 있을 때를 위해 즉시 시도 */
+    {
+      const adminLink = document.getElementById('adminLink');
+      if (adminLink) {
+        adminLink.addEventListener('click', e => {
+          e.preventDefault();
+          openAdminPanel();
+        });
+      }
     }
 
     /* === 시민 투표 (Civic Poll) === */

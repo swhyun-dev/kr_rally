@@ -2262,6 +2262,72 @@
       margin-top: 10px;
       width: 100%
     }
+    .la-section {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      margin-top: 10px
+    }
+    .la-h {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--gold);
+      margin-bottom: 8px
+    }
+    .la-api input[type="password"] {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-bottom: 6px;
+      font-family: monospace
+    }
+    .la-api input:focus { border-color: var(--accent); outline: none }
+    .la-buttons {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px
+    }
+    .la-buttons button {
+      flex: 1;
+      background: rgba(255, 32, 48, .1);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 7px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s
+    }
+    .la-buttons button:hover:not(:disabled) {
+      background: rgba(255, 32, 48, .2)
+    }
+    .la-buttons button:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+    .la-status {
+      font-size: 11px;
+      color: var(--sub);
+      text-align: center;
+      padding: 6px;
+      background: rgba(255, 255, 255, .03);
+      border-radius: 6px;
+      margin-top: 6px;
+      line-height: 1.5
+    }
+    .la-status.on { color: var(--gold) }
+    .la-status.err { color: var(--accent) }
+    .la-note {
+      font-size: 10px;
+      color: var(--sub);
+      opacity: .7;
+      margin-top: 6px;
+      line-height: 1.4
+    }
   </style>
 </head>
 
@@ -2458,7 +2524,7 @@
     <!-- 실시간 방송 (라이브 진행 중인 채널만 표시) -->
     <section class="section" id="liveSection">
       <h2 class="reveal">📺 <span class="em">실시간</span> 방송</h2>
-      <p class="lead reveal" style="--delay:.06s">🔴 보수 유튜브 채널 라이브 모음 · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
+      <p class="lead reveal" style="--delay:.06s">🔴 <b style="color:var(--gold)">라이브 자동 감지 중</b> · 라이브 중인 채널만 표시됩니다 · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
 
       <div class="livetv reveal lv-toggle" style="--delay:.04s" id="live-hwang" data-key="hwang" data-cid="UCnacnZiUscX6jrVKu78Notg" data-name="황교안TV">
         <div class="lvlabel">📡 황교안TV <span class="lvsub">@Hwang_Kyo-ahn_TV</span> <span class="lvon">🔴 LIVE</span></div>
@@ -3151,37 +3217,229 @@
       renderLiveStatus({});
     });
 
-    /* === 운영자 패널 (라이브 토글) — ?admin=resetkr0603 으로 활성화 === */
+    /* === YouTube Data API 자동 감지 === */
+    const YT_REFRESH_INTERVAL_MS = 5 * 60 * 1000; /* 5분 캐시 */
+    let ytTimer = null;
+
+    async function ytFetchChannelPlaylists(apiKey) {
+      const ids = LIVE_CHANNELS.map(c => c.cid).join(',');
+      const url = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${ids}&key=${apiKey}`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`channels.list ${r.status}: ${await r.text()}`);
+      const data = await r.json();
+      const map = {};
+      data.items.forEach(item => {
+        const ch = LIVE_CHANNELS.find(c => c.cid === item.id);
+        if (ch) map[ch.key] = item.contentDetails.relatedPlaylists.uploads;
+      });
+      return map;
+    }
+
+    async function ytFetchLatestVideos(playlistId, apiKey) {
+      const url = `https://www.googleapis.com/youtube/v3/playlistItems?playlistId=${playlistId}&part=snippet&maxResults=5&key=${apiKey}`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`playlistItems.list ${r.status}`);
+      const data = await r.json();
+      return (data.items || []).map(item => item.snippet.resourceId.videoId).filter(Boolean);
+    }
+
+    async function ytFetchLiveStreaming(videoIds, apiKey) {
+      if (videoIds.length === 0) return [];
+      const url = `https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${videoIds.join(',')}&key=${apiKey}`;
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`videos.list ${r.status}`);
+      const data = await r.json();
+      return data.items || [];
+    }
+
+    async function ytRefreshLiveStatus(apiKey, force = false) {
+      if (!apiKey) return { skipped: 'no key' };
+
+      /* Race avoidance via transaction */
+      if (!force) {
+        const tx = await runTransaction(ref(db, 'liveStatusMeta/lastChecked'), cur => {
+          if (cur && Date.now() - cur < YT_REFRESH_INTERVAL_MS) return; /* lose race */
+          return Date.now();
+        });
+        if (!tx.committed) return { skipped: 'race' };
+      } else {
+        await set(ref(db, 'liveStatusMeta/lastChecked'), Date.now());
+      }
+
+      try {
+        /* 1) 채널별 uploads 플레이리스트 (Firebase 캐시) */
+        let playlists = (await get(ref(db, 'liveStatusMeta/playlists'))).val();
+        if (force || !playlists || Object.keys(playlists).length < LIVE_CHANNELS.length) {
+          playlists = await ytFetchChannelPlaylists(apiKey);
+          await set(ref(db, 'liveStatusMeta/playlists'), playlists);
+        }
+
+        /* 2) 채널별 최근 영상 5개씩 */
+        const videoToChannel = {};
+        const allVideoIds = [];
+        for (const ch of LIVE_CHANNELS) {
+          const pid = playlists[ch.key];
+          if (!pid) continue;
+          try {
+            const vids = await ytFetchLatestVideos(pid, apiKey);
+            vids.forEach(v => { videoToChannel[v] = ch.key; allVideoIds.push(v); });
+          } catch (e) { console.warn(`${ch.name} 영상 조회 실패`, e); }
+        }
+
+        /* 3) 라이브 스트리밍 정보 일괄 조회 */
+        const videos = await ytFetchLiveStreaming(allVideoIds, apiKey);
+
+        /* 4) 현재 라이브 중인 채널 판별 */
+        const liveSet = new Set();
+        const liveVids = {};
+        videos.forEach(v => {
+          const ls = v.liveStreamingDetails;
+          if (ls && ls.actualStartTime && !ls.actualEndTime) {
+            const k = videoToChannel[v.id];
+            if (k) { liveSet.add(k); liveVids[k] = v.id; }
+          }
+        });
+
+        /* 5) Firebase /liveStatus 업데이트 */
+        const updates = {};
+        LIVE_CHANNELS.forEach(ch => { updates[ch.key] = liveSet.has(ch.key); });
+        await set(ref(db, 'liveStatus'), updates);
+        await set(ref(db, 'liveStatusMeta/videoIds'), liveVids);
+        await set(ref(db, 'liveStatusMeta/lastSuccess'), Date.now());
+
+        return { ok: true, liveCount: liveSet.size, total: LIVE_CHANNELS.length };
+      } catch (e) {
+        await set(ref(db, 'liveStatusMeta/lastError'), { msg: e.message, ts: Date.now() });
+        throw e;
+      }
+    }
+
+    function ytStartAuto() {
+      const apiKey = localStorage.getItem('ytApiKey');
+      if (!apiKey) return;
+      ytRefreshLiveStatus(apiKey).catch(e => console.warn('자동 감지 실패', e));
+      if (ytTimer) clearInterval(ytTimer);
+      ytTimer = setInterval(() => {
+        const k = localStorage.getItem('ytApiKey');
+        if (k) ytRefreshLiveStatus(k).catch(e => console.warn('자동 감지 실패', e));
+      }, 60 * 1000); /* 1분마다 트리거 (캐시 검사 후 실제로는 5분 간격) */
+    }
+    /* 페이지 로드 시 키가 있으면 자동 시작 */
+    setTimeout(() => { if (myUid) ytStartAuto(); else setTimeout(ytStartAuto, 2000); }, 1500);
+
+    /* === 운영자 패널 — ?admin=resetkr0603 으로 활성화 === */
     if (new URLSearchParams(location.search).get('admin') === 'resetkr0603') {
       const adminBox = document.createElement('div');
       adminBox.className = 'live-admin';
       adminBox.innerHTML = `
-        <h4>🛡️ 운영자 — 라이브 토글</h4>
-        <div class="la-list">
-          ${LIVE_CHANNELS.map(c => `
-            <label class="la-row" data-key="${c.key}">
-              <input type="checkbox" data-key="${c.key}" />
-              <span class="la-name">${c.name}</span>
-              <span class="la-dot"></span>
-            </label>
-          `).join('')}
+        <h4>🛡️ 운영자 패널</h4>
+
+        <div class="la-api la-section">
+          <div class="la-h">🤖 자동 감지 (YouTube API)</div>
+          <input type="password" id="laApiKey" placeholder="API 키 입력 (Google Cloud)" autocomplete="off" />
+          <div class="la-buttons">
+            <button type="button" id="laApiSave">키 저장</button>
+            <button type="button" id="laApiRefresh">지금 새로고침</button>
+          </div>
+          <div class="la-status" id="laApiStatus">⚫ 미설정</div>
         </div>
+
+        <div class="la-manual la-section">
+          <div class="la-h">✋ 수동 토글 (오버라이드)</div>
+          <div class="la-list">
+            ${LIVE_CHANNELS.map(c => `
+              <label class="la-row" data-key="${c.key}">
+                <input type="checkbox" data-key="${c.key}" />
+                <span class="la-name">${c.name}</span>
+                <span class="la-dot"></span>
+              </label>
+            `).join('')}
+          </div>
+          <div class="la-note">⚠️ 자동 감지 켜져 있으면 다음 사이클(최대 5분)에 덮어쓰임.</div>
+        </div>
+
         <button class="la-close" type="button">닫기</button>
       `;
       document.body.appendChild(adminBox);
 
-      /* 현재 상태로 체크박스 초기화 + 실시간 동기화 (기본: 체크됨) */
+      const apiKeyInput = adminBox.querySelector('#laApiKey');
+      const apiStatusEl = adminBox.querySelector('#laApiStatus');
+      const apiSaveBtn = adminBox.querySelector('#laApiSave');
+      const apiRefreshBtn = adminBox.querySelector('#laApiRefresh');
+
+      /* 저장된 키 prefill (마스킹) */
+      const savedKey = localStorage.getItem('ytApiKey') || '';
+      apiKeyInput.value = savedKey;
+
+      function updateApiStatus() {
+        const key = localStorage.getItem('ytApiKey');
+        if (!key) {
+          apiStatusEl.textContent = '⚫ 미설정 (수동 모드)';
+          apiStatusEl.className = 'la-status';
+          return;
+        }
+        onValue(ref(db, 'liveStatusMeta'), snap => {
+          const meta = snap.val() || {};
+          const last = meta.lastSuccess;
+          if (last) {
+            const ago = Math.floor((Date.now() - last) / 60000);
+            apiStatusEl.innerHTML = `🟢 자동 감지 ON · 마지막 체크 ${ago}분 전`;
+            apiStatusEl.className = 'la-status on';
+          } else if (meta.lastError) {
+            apiStatusEl.innerHTML = `⚠️ 에러: ${meta.lastError.msg.slice(0, 50)}`;
+            apiStatusEl.className = 'la-status err';
+          } else {
+            apiStatusEl.textContent = '🟡 자동 감지 ON · 첫 체크 대기';
+            apiStatusEl.className = 'la-status';
+          }
+        });
+      }
+      updateApiStatus();
+
+      apiSaveBtn.addEventListener('click', () => {
+        const key = apiKeyInput.value.trim();
+        if (key) {
+          localStorage.setItem('ytApiKey', key);
+          alert('✅ API 키 저장됨. 자동 감지 시작합니다.');
+          ytStartAuto();
+        } else {
+          localStorage.removeItem('ytApiKey');
+          if (ytTimer) { clearInterval(ytTimer); ytTimer = null; }
+          alert('❌ API 키 삭제됨. 수동 모드로 전환.');
+        }
+        updateApiStatus();
+      });
+
+      apiRefreshBtn.addEventListener('click', async () => {
+        const key = localStorage.getItem('ytApiKey');
+        if (!key) { alert('API 키부터 저장하세요.'); return; }
+        apiRefreshBtn.disabled = true;
+        apiRefreshBtn.textContent = '체크 중...';
+        try {
+          const result = await ytRefreshLiveStatus(key, true);
+          if (result.ok) {
+            alert(`✅ 체크 완료\n라이브 중: ${result.liveCount} / ${result.total} 채널`);
+          }
+        } catch (e) {
+          alert('❌ 실패: ' + e.message);
+        } finally {
+          apiRefreshBtn.disabled = false;
+          apiRefreshBtn.textContent = '지금 새로고침';
+        }
+      });
+
+      /* 수동 토글: 현재 상태로 체크박스 초기화 (기본: 체크됨) */
       onValue(ref(db, 'liveStatus'), snap => {
         const status = snap.val() || {};
-        adminBox.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        adminBox.querySelectorAll('.la-manual input[type="checkbox"]').forEach(cb => {
           const k = cb.dataset.key;
           cb.checked = status[k] !== false;
           cb.closest('.la-row').classList.toggle('on', cb.checked);
         });
       });
 
-      /* 체크박스 → Firebase 쓰기 */
-      adminBox.addEventListener('change', async e => {
+      /* 수동 체크박스 → Firebase 쓰기 */
+      adminBox.querySelector('.la-manual').addEventListener('change', async e => {
         const cb = e.target;
         if (cb.tagName !== 'INPUT') return;
         const key = cb.dataset.key;

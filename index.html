@@ -1999,6 +1999,161 @@
       max-height: 95vh;
       object-fit: contain
     }
+
+    /* === 시민 투표 === */
+    .poll-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px 18px;
+      position: relative;
+      overflow: hidden
+    }
+    .poll-loading {
+      text-align: center;
+      color: var(--sub);
+      padding: 30px 10px;
+      font-size: 14px
+    }
+    .poll-tag {
+      display: inline-block;
+      background: rgba(255, 32, 48, .14);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: .3px;
+      margin-bottom: 12px
+    }
+    .poll-q {
+      font-size: 17px;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.45
+    }
+    .poll-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+    .poll-opt {
+      position: relative;
+      background: transparent;
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all .15s;
+      text-align: left;
+      width: 100%;
+      font-family: inherit;
+      color: var(--text);
+      overflow: hidden
+    }
+    .poll-opt:hover:not(:disabled) {
+      border-color: var(--accent);
+      transform: translateY(-1px)
+    }
+    .poll-opt.voted {
+      border-color: var(--gold);
+      background: rgba(255, 213, 74, .05)
+    }
+    .poll-opt:disabled { cursor: default }
+    .opt-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, rgba(255, 32, 48, .14), rgba(255, 32, 48, .04));
+      width: 0;
+      transition: width .8s cubic-bezier(.4, 0, .2, 1);
+      z-index: 0
+    }
+    .poll-opt.voted .opt-bar {
+      background: linear-gradient(90deg, rgba(255, 213, 74, .28), rgba(255, 213, 74, .1))
+    }
+    .opt-row {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+    .opt-num {
+      flex: 0 0 26px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255, 32, 48, .14);
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center
+    }
+    .poll-opt.voted .opt-num {
+      background: var(--gold);
+      color: #1a1a1a
+    }
+    .opt-label {
+      flex: 1;
+      font-weight: 700;
+      font-size: 14px;
+      line-height: 1.4
+    }
+    .opt-pct {
+      font-weight: 900;
+      color: var(--gold);
+      font-size: 15px;
+      font-variant-numeric: tabular-nums;
+      min-width: 42px;
+      text-align: right
+    }
+    .opt-cnt {
+      font-size: 11px;
+      color: var(--sub);
+      margin-left: 6px;
+      font-variant-numeric: tabular-nums
+    }
+    .poll-check {
+      display: inline-block;
+      margin-left: 4px;
+      color: var(--gold);
+      font-weight: 900
+    }
+    .poll-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+      color: var(--sub)
+    }
+    .pf-total b {
+      color: var(--text);
+      font-weight: 900
+    }
+    .poll-disclaim {
+      font-size: 11px;
+      color: var(--sub);
+      margin-top: 12px;
+      text-align: center;
+      opacity: .65;
+      line-height: 1.5
+    }
+    .poll-changed {
+      animation: pollFlash .5s
+    }
+    @keyframes pollFlash {
+      0% { transform: scale(1) }
+      50% { transform: scale(1.02) }
+      100% { transform: scale(1) }
+    }
   </style>
 </head>
 
@@ -2095,6 +2250,16 @@
         <button class="btn primary" onclick="openNav()">✊ 참여한다 / 길찾기 시작</button>
         <a class="btn gold" href="https://map.kakao.com/link/to/올림픽공원 핸드볼경기장,37.5207,127.1212" target="_blank" rel="noopener">🚌 교통편 (카카오맵 길찾기)</a>
         <button class="btn outline" onclick="copyLink()">🔗 링크 복사 (단톡·SNS에 공유)</button>
+      </div>
+    </section>
+
+    <!-- 시민 투표 -->
+    <section class="section" id="pollSection">
+      <h2 class="reveal">🗳️ <span class="em">시민</span> 투표</h2>
+      <p class="lead reveal" style="--delay:.06s">시민 의견 수렴용 투표. 결과는 참고용이며 최종 결정은 주최측 안내를 따릅니다.</p>
+
+      <div class="poll-card reveal" style="--delay:.04s" id="pollCard">
+        <div class="poll-loading">⚡ 투표 불러오는 중...</div>
       </div>
     </section>
 
@@ -2595,10 +2760,13 @@
     let statsReportCount = null;
     function updateCpMsgs() {
       const el = document.getElementById('cpMsgs');
-      if (!el) return;
+      const ccountEl = document.getElementById('ccount');
       const localCount = typeof count !== 'undefined' ? count : 0;
       const display = Math.max(statsMsgCount || 0, localCount);
-      if (display > 0) el.textContent = display.toLocaleString('ko-KR');
+      if (display > 0) {
+        if (el) el.textContent = display.toLocaleString('ko-KR');
+        if (ccountEl) ccountEl.textContent = `💬 ${display.toLocaleString('ko-KR')}`;
+      }
     }
     function updateRTotalCount() {
       const el = document.getElementById('rTotalCount');
@@ -2741,8 +2909,8 @@
 
       const loading = msgsEl.querySelector('.cloading');
       if (loading) loading.remove();
-      if (!connected) { connected = true; countEl.textContent = `💬 ${count}`; }
-      else countEl.textContent = `💬 ${count}`;
+      if (!connected) connected = true;
+      /* 채팅 헤더 카운트는 stats/totalMessages 기준으로 updateCpMsgs() 에서 갱신됨 */
 
       /* 사회증거 카드 메시지 수 갱신 (stats 노드 없을 때 fallback) */
       updateCpMsgs();
@@ -2848,6 +3016,156 @@
         }
       });
     }
+
+    /* === 시민 투표 (Civic Poll) === */
+    const POLL_ID = 'poll_001';
+    const POLL_DEFAULT = {
+      question: '다음 집결지 장소는 어디라고 하시나요?',
+      options: {
+        a: '선관위',
+        b: '광화문',
+        c: '잠실 그대로 유지 (여기서 끝장)'
+      }
+    };
+    const POLL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+    const pollCard = document.getElementById('pollCard');
+    let myVote = null;
+    let pollData = null;
+
+    /* 첫 로드 시 투표 노드가 없으면 자동 생성 */
+    async function ensurePollExists() {
+      try {
+        const pRef = ref(db, `polls/${POLL_ID}`);
+        const snap = await get(pRef);
+        if (!snap.exists()) {
+          await set(pRef, {
+            question: POLL_DEFAULT.question,
+            options: POLL_DEFAULT.options,
+            votes: { a: 0, b: 0, c: 0 },
+            active: true,
+            createdAt: serverTimestamp(),
+            expiresAt: Date.now() + POLL_DURATION_MS
+          });
+          console.log('투표 생성:', POLL_ID);
+        }
+      } catch (e) {
+        console.warn('투표 생성 실패', e);
+      }
+    }
+
+    function getLocalVote() {
+      try { return localStorage.getItem(`vote_${POLL_ID}`); } catch { return null; }
+    }
+    function setLocalVote(opt) {
+      try { localStorage.setItem(`vote_${POLL_ID}`, opt); } catch { }
+    }
+
+    function fmtRemaining(ms) {
+      const totalSec = Math.floor(ms / 1000);
+      const days = Math.floor(totalSec / 86400);
+      const hours = Math.floor((totalSec % 86400) / 3600);
+      const mins = Math.floor((totalSec % 3600) / 60);
+      if (days > 0) return `⏱️ <b>${days}일 ${hours}시간</b> 남음`;
+      if (hours > 0) return `⏱️ <b>${hours}시간 ${mins}분</b> 남음`;
+      return `⏱️ <b>${mins}분</b> 남음`;
+    }
+
+    function renderPoll() {
+      if (!pollCard || !pollData) return;
+      const votes = pollData.votes || {};
+      const opts = pollData.options || {};
+      const optKeys = Object.keys(opts);
+      const total = optKeys.reduce((s, k) => s + (votes[k] || 0), 0);
+      const expiresAt = pollData.expiresAt || 0;
+      const remaining = expiresAt - Date.now();
+      const expiresHtml = remaining > 0 ? fmtRemaining(remaining) : '<b style="color:var(--accent)">마감됨</b>';
+
+      const optsHtml = optKeys.map(k => {
+        const v = votes[k] || 0;
+        const pct = total > 0 ? Math.round((v / total) * 100) : 0;
+        const isMine = myVote === k;
+        const numLabel = k === 'a' ? '1' : k === 'b' ? '2' : '3';
+        return `
+          <button class="poll-opt${isMine ? ' voted' : ''}" data-opt="${k}" ${remaining <= 0 ? 'disabled' : ''}>
+            <span class="opt-bar" style="width:${pct}%"></span>
+            <span class="opt-row">
+              <span class="opt-num">${numLabel}</span>
+              <span class="opt-label">${esc(opts[k] || '')}${isMine ? '<span class="poll-check"> ✓</span>' : ''}</span>
+              <span class="opt-pct">${pct}%</span>
+              <span class="opt-cnt">(${v})</span>
+            </span>
+          </button>
+        `;
+      }).join('');
+
+      pollCard.innerHTML = `
+        <span class="poll-tag">🔴 진행 중</span>
+        <div class="poll-q">${esc(pollData.question || '')}</div>
+        <div class="poll-options">${optsHtml}</div>
+        <div class="poll-foot">
+          <span class="pf-total">총 <b>${total.toLocaleString('ko-KR')}</b>표</span>
+          <span>${expiresHtml}</span>
+        </div>
+        <div class="poll-disclaim">⚠️ 시민 참고 의견 · 익명 투표 · 변경 가능</div>
+      `;
+
+      pollCard.querySelectorAll('.poll-opt').forEach(btn => {
+        btn.addEventListener('click', () => vote(btn.dataset.opt));
+      });
+    }
+
+    async function vote(optKey) {
+      if (!myUid) { alert('로그인 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+      if (!optKey || !pollData) return;
+      if (myVote === optKey) return;
+      const oldVote = myVote;
+
+      pollCard.classList.add('poll-changed');
+      setTimeout(() => pollCard.classList.remove('poll-changed'), 500);
+
+      try {
+        await runTransaction(ref(db, `polls/${POLL_ID}/votes/${optKey}`), cur => (cur || 0) + 1);
+        if (oldVote) {
+          await runTransaction(ref(db, `polls/${POLL_ID}/votes/${oldVote}`), cur => Math.max(0, (cur || 0) - 1));
+        }
+        await set(ref(db, `polls/${POLL_ID}/voters/${myUid}`), optKey);
+        myVote = optKey;
+        setLocalVote(optKey);
+      } catch (e) {
+        console.error('투표 실패', e);
+        alert('투표 실패. 잠시 후 다시 시도해주세요.');
+      }
+    }
+
+    async function initPoll() {
+      await ensurePollExists();
+      try {
+        const voterSnap = await get(ref(db, `polls/${POLL_ID}/voters/${myUid}`));
+        myVote = voterSnap.val() || getLocalVote();
+        if (myVote && !voterSnap.exists()) {
+          await set(ref(db, `polls/${POLL_ID}/voters/${myUid}`), myVote);
+        }
+      } catch (e) {
+        myVote = getLocalVote();
+      }
+      onValue(ref(db, `polls/${POLL_ID}`), snap => {
+        pollData = snap.val();
+        if (!pollData) {
+          pollCard.innerHTML = '<div class="poll-loading">투표 없음</div>';
+          return;
+        }
+        renderPoll();
+      }, err => {
+        console.warn('투표 구독 실패', err);
+        pollCard.innerHTML = '<div class="poll-loading">⚠️ 투표 불러오기 실패. 새로고침 해주세요.</div>';
+      });
+      setInterval(() => { if (pollData) renderPoll(); }, 60000);
+    }
+    function tryInitPoll() {
+      if (myUid) initPoll();
+      else setTimeout(tryInitPoll, 500);
+    }
+    tryInitPoll();
 
     /* === 현장 제보 (Field Reports) === */
     const REPORT_LIMIT = 60;

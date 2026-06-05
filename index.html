@@ -776,6 +776,129 @@
     }
     .livetv .lvch:hover { filter: brightness(1.15) }
 
+    /* 사회적 증거 카드 (채팅 위) */
+    .chat-proof {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 14px
+    }
+    .chat-proof .cp-stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 6px;
+      text-align: center
+    }
+    .chat-proof .cp-num {
+      display: block;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      margin-bottom: 5px;
+      letter-spacing: -.5px
+    }
+    .chat-proof .cp-lbl {
+      font-size: 11px;
+      color: var(--sub);
+      font-weight: 700;
+      letter-spacing: -.2px
+    }
+
+    /* 빠른 응원 버튼 */
+    .quick-cheer {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: rgba(255, 213, 74, .08);
+      border: 1px solid rgba(255, 213, 74, .25);
+      border-radius: 10px
+    }
+    .quick-cheer .qc-title {
+      font-size: 10.5px;
+      color: var(--gold);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 7px;
+      letter-spacing: .5px
+    }
+    .quick-cheer .qc-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 5px
+    }
+    .quick-cheer .qc-btn {
+      background: rgba(0, 0, 0, .4);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 0;
+      font-size: 20px;
+      cursor: pointer;
+      transition: transform .1s, background .15s, border-color .15s;
+      font-family: inherit;
+      color: #fff;
+      line-height: 1
+    }
+    .quick-cheer .qc-btn:hover { background: rgba(255, 32, 48, .15); border-color: var(--accent) }
+    .quick-cheer .qc-btn:active { transform: scale(.88) }
+    .quick-cheer .qc-btn:disabled { opacity: .4; cursor: not-allowed }
+    @keyframes qcShake {
+      0%, 100% { transform: translateX(0) }
+      25% { transform: translateX(-4px) }
+      75% { transform: translateX(4px) }
+    }
+
+    /* 새 메시지 토스트 */
+    .msg-toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      z-index: 90;
+      background: var(--card);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #fff;
+      max-width: calc(100% - 32px);
+      width: 380px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .6);
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .3s, transform .3s;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+    .msg-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+    .msg-toast .toast-icon {
+      font-size: 18px;
+      flex: 0 0 auto
+    }
+    .msg-toast .toast-body { flex: 1; overflow: hidden }
+    .msg-toast .toast-name {
+      color: var(--accent);
+      font-weight: 800;
+      margin-right: 6px
+    }
+    .msg-toast .toast-text {
+      color: var(--sub);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+    .msg-toast .toast-go {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 800;
+      flex: 0 0 auto
+    }
+
     /* === 실시간 채팅 === */
     .chat {
       background: var(--card);
@@ -1580,6 +1703,63 @@
       </div>
     </section>
 
+    <!-- 실시간 피드 (상단으로 올림) -->
+    <section class="section" id="feedSection">
+      <h2 class="reveal">📡 <span class="em">실시간</span> 피드 — 지금 여기서 함께</h2>
+      <p class="lead reveal" style="--delay:.06s">한 줄 응원·현장 인증·소식을 실시간으로 나누는 곳.</p>
+
+      <div class="chat-proof reveal" style="--delay:.04s">
+        <div class="cp-stat">
+          <span class="cp-num" id="cpOnline">-</span>
+          <span class="cp-lbl">지금 함께</span>
+        </div>
+        <div class="cp-stat">
+          <span class="cp-num" id="cpMsgs">-</span>
+          <span class="cp-lbl">응원 메시지</span>
+        </div>
+        <div class="cp-stat">
+          <span class="cp-num" id="cpVisits">-</span>
+          <span class="cp-lbl">다녀간 분</span>
+        </div>
+      </div>
+
+      <div class="chat reveal" style="--delay:.05s">
+        <div class="chead">
+          <span class="ldot"></span>
+          <span>LIVE 채팅</span>
+          <span class="cstats">
+            <span class="online" id="conline">🟢 - 명</span>
+            <span class="ucnt" id="ccount">💬 0</span>
+          </span>
+        </div>
+        <div class="cmsgs" id="cmsgs">
+          <div class="cloading">⚡ 연결 중...</div>
+        </div>
+        <div class="cinput">
+          <div class="quick-cheer">
+            <div class="qc-title">⚡ 빠른 응원 (1탭 전송)</div>
+            <div class="qc-grid">
+              <button class="qc-btn" type="button" data-msg="🇰🇷 대한민국 화이팅!">🇰🇷</button>
+              <button class="qc-btn" type="button" data-msg="🔥 이제부터 시작입니다!">🔥</button>
+              <button class="qc-btn" type="button" data-msg="👊 함께합니다!">👊</button>
+              <button class="qc-btn" type="button" data-msg="🙌 응원합니다!">🙌</button>
+              <button class="qc-btn" type="button" data-msg="✊ 끝까지 갑시다!">✊</button>
+              <button class="qc-btn" type="button" data-msg="⚡ 지금 갑니다!">⚡</button>
+            </div>
+          </div>
+          <input class="cname" id="cname" type="text" placeholder="닉네임 (선택 · 최대 12자)" maxlength="12" />
+          <div class="cinrow">
+            <input class="ctext" id="ctext" type="text" placeholder="현장 소식·응원 메시지 (200자)" maxlength="200" />
+            <button class="csend" id="csend" type="button">전송</button>
+          </div>
+          <div class="cnotice">
+            ※ 게시물은 작성자 본인 책임이며, 운영자가 부적절한 게시물을 즉시 삭제할 수 있습니다.<br />
+            욕설·혐오·허위정보·개인정보 게시 금지 · 5초당 1개 메시지 제한
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 실시간 방송 -->
     <section class="section">
       <h2 class="reveal">📺 <span class="em">실시간</span> 방송</h2>
@@ -1673,37 +1853,6 @@
       </div>
     </section>
 
-    <!-- 실시간 피드 placeholder -->
-    <section class="section">
-      <h2 class="reveal">📡 <span class="em">실시간</span> 피드</h2>
-      <p class="lead reveal" style="--delay:.06s">현장 소식·인증샷·응원 메시지가 실시간으로 올라옵니다.</p>
-
-      <div class="chat reveal" style="--delay:.05s">
-        <div class="chead">
-          <span class="ldot"></span>
-          <span>LIVE 채팅</span>
-          <span class="cstats">
-            <span class="online" id="conline">🟢 - 명</span>
-            <span class="ucnt" id="ccount">💬 0</span>
-          </span>
-        </div>
-        <div class="cmsgs" id="cmsgs">
-          <div class="cloading">⚡ 연결 중...</div>
-        </div>
-        <div class="cinput">
-          <input class="cname" id="cname" type="text" placeholder="닉네임 (최대 12자)" maxlength="12" />
-          <div class="cinrow">
-            <input class="ctext" id="ctext" type="text" placeholder="현장 소식·응원 메시지 (200자)" maxlength="200" />
-            <button class="csend" id="csend" type="button">전송</button>
-          </div>
-          <div class="cnotice">
-            ※ 게시물은 작성자 본인 책임이며, 운영자가 부적절한 게시물을 즉시 삭제할 수 있습니다.<br />
-            욕설·혐오·허위정보·개인정보 게시 금지 · 5초당 1개 메시지 제한
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- 사이트 소개 + 개발자 메시지 창구 -->
     <section class="section">
       <h2 class="reveal">💌 <span class="em">함께 만든</span> 사이트</h2>
@@ -1777,6 +1926,13 @@
     <span class="blast">📢</span>
     <span class="msg"><b>오늘이 그 날입니다</b><br />함께 가는 길, 지금 확인</span>
     <button class="go" onclick="openNav()">참여 →</button>
+  </div>
+
+  <!-- 새 메시지 토스트 -->
+  <div class="msg-toast" id="msgToast" hidden>
+    <span class="toast-icon">💬</span>
+    <span class="toast-body"><span class="toast-name" id="toastName"></span><span class="toast-text" id="toastText"></span></span>
+    <span class="toast-go">바로 보기 →</span>
   </div>
 
   <!-- 첫 방문 환영 팝업 -->
@@ -1915,11 +2071,88 @@
       onValue(allPresenceRef, snap => {
         const n = snap.size || 0;
         if (onlineEl) onlineEl.textContent = `🟢 ${n.toLocaleString('ko-KR')}명 접속`;
+        const cpOnlineEl = document.getElementById('cpOnline');
+        if (cpOnlineEl) cpOnlineEl.textContent = n.toLocaleString('ko-KR');
       }, err => {
         console.warn('접속자 수 불러오기 실패', err);
         if (onlineEl) onlineEl.textContent = '🟢 LIVE';
       });
     }
+
+    /* 누적 방문 카운트 표시 (사회증거) */
+    function loadVisits() {
+      const el = document.getElementById('cpVisits');
+      if (!el) return;
+      fetch('https://api.counterapi.dev/v1/resetkr0603-stats-8309c3414e/visits/')
+        .then(r => r.json())
+        .then(d => {
+          if (d && typeof d.count === 'number') {
+            el.textContent = d.count.toLocaleString('ko-KR');
+          }
+        })
+        .catch(() => { el.textContent = '-'; });
+    }
+    loadVisits();
+    /* 30초마다 갱신 */
+    setInterval(loadVisits, 30000);
+
+    /* === 새 메시지 토스트 === */
+    const toastEl = document.getElementById('msgToast');
+    const toastName = document.getElementById('toastName');
+    const toastText = document.getElementById('toastText');
+    let toastTimer = null;
+    function showToast(name, text) {
+      if (!toastEl) return;
+      toastName.textContent = name;
+      const trimmed = text.length > 60 ? text.slice(0, 60) + '…' : text;
+      toastText.textContent = trimmed;
+      toastEl.hidden = false;
+      void toastEl.offsetWidth;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toastEl.classList.remove('show');
+        setTimeout(() => { toastEl.hidden = true; }, 300);
+      }, 4500);
+    }
+    if (toastEl) {
+      toastEl.addEventListener('click', () => {
+        document.getElementById('feedSection').scrollIntoView({ behavior: 'smooth' });
+        toastEl.classList.remove('show');
+      });
+    }
+
+    /* === 빠른 응원 버튼 === */
+    document.querySelectorAll('.qc-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const msg = btn.dataset.msg;
+        if (!msg) return;
+        const now = Date.now();
+        if (now - lastSent < 5000) {
+          /* 버튼 살짝 흔들기 */
+          btn.style.animation = 'none';
+          void btn.offsetWidth;
+          btn.style.animation = 'qcShake .3s';
+          return;
+        }
+        const name = (nameEl.value || '').trim() || '익명시민';
+        btn.disabled = true;
+        try {
+          await push(ref(db, 'messages'), {
+            name: name.slice(0, 12),
+            text: msg,
+            time: serverTimestamp(),
+            uid: myUid || 'anon'
+          });
+          lastSent = now;
+          lastText = msg;
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setTimeout(() => { btn.disabled = false; }, 5000);
+        }
+      });
+    });
 
     /* 한글 욕설 클라이언트 필터 (기본 리스트) */
     const blocked = ['시발', '씨발', 'ㅅㅂ', '병신', 'ㅂㅅ', '개새', '개색', '좆', '미친', '닥쳐', '꺼져', '죽어', '지랄', 'ㅈㄹ', '존나', 'ㅈㄴ', '빨아', '꼴려', '새끼', 'ㅅㄲ'];
@@ -1965,6 +2198,17 @@
       if (loading) loading.remove();
       if (!connected) { connected = true; countEl.textContent = `💬 ${count}`; }
       else countEl.textContent = `💬 ${count}`;
+
+      /* 사회증거 카드 메시지 수 갱신 */
+      const cpMsgsEl = document.getElementById('cpMsgs');
+      if (cpMsgsEl) cpMsgsEl.textContent = count.toLocaleString('ko-KR');
+
+      /* 새 메시지 토스트 (첫 로드 끝난 뒤 + 본인 메시지 아닐 때 + 채팅 안 보일 때) */
+      if (!firstLoad && data.uid !== myUid && !document.hidden) {
+        const chatRect = msgsEl.getBoundingClientRect();
+        const chatVisible = chatRect.top < window.innerHeight && chatRect.bottom > 0;
+        if (!chatVisible) showToast(data.name || '익명', data.text || '');
+      }
 
       const nearBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 180;
       if (firstLoad || nearBottom) msgsEl.scrollTop = msgsEl.scrollHeight;

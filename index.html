@@ -2154,6 +2154,114 @@
       50% { transform: scale(1.02) }
       100% { transform: scale(1) }
     }
+
+    /* === 라이브 채널 자동 표시 === */
+    .lvon {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 5px;
+      margin-left: 6px;
+      letter-spacing: .5px;
+      animation: pulse 1.6s ease-in-out infinite
+    }
+    .lv-empty {
+      text-align: center;
+      padding: 40px 20px;
+      background: var(--card);
+      border: 2px dashed var(--line);
+      border-radius: 14px;
+      color: var(--sub)
+    }
+    .lv-empty-icon {
+      font-size: 42px;
+      margin-bottom: 14px;
+      opacity: .4
+    }
+    .lv-empty-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px
+    }
+    .lv-empty-sub {
+      font-size: 13px;
+      color: var(--sub);
+      line-height: 1.6
+    }
+
+    /* === 운영자 패널 (라이브 토글) === */
+    .live-admin {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--bg);
+      border: 2px solid var(--gold);
+      border-radius: 14px;
+      padding: 16px;
+      z-index: 999;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, .6);
+      max-width: 280px;
+      animation: modalin .3s
+    }
+    .live-admin h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 6px
+    }
+    .la-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+    .la-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s
+    }
+    .la-row:hover { border-color: var(--accent) }
+    .la-row input { margin: 0 }
+    .la-row.on {
+      background: rgba(255, 213, 74, .08);
+      border-color: var(--gold);
+      color: var(--gold);
+      font-weight: 700
+    }
+    .la-row .la-name { flex: 1 }
+    .la-row .la-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--line);
+      transition: all .3s
+    }
+    .la-row.on .la-dot {
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent)
+    }
+    .la-close {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--sub);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      margin-top: 10px;
+      width: 100%
+    }
   </style>
 </head>
 
@@ -2347,59 +2455,40 @@
       </div>
     </section>
 
-    <!-- 실시간 방송 (자동 추적) -->
-    <section class="section">
+    <!-- 실시간 방송 (라이브 진행 중인 채널만 표시) -->
+    <section class="section" id="liveSection">
       <h2 class="reveal">📺 <span class="em">실시간</span> 방송</h2>
-      <p class="lead reveal" style="--delay:.06s">🔴 <b style="color:var(--gold)">라이브 자동 업데이트 중</b> · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
+      <p class="lead reveal" style="--delay:.06s">🔴 <b style="color:var(--gold)">라이브 진행 중인 채널만 표시</b> · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
 
-      <div class="livetv reveal" style="--delay:.04s">
-        <div class="lvlabel">📡 황교안TV <span class="lvsub">@Hwang_Kyo-ahn_TV</span></div>
-        <div class="lvbox">
-          <iframe src="https://www.youtube.com/embed/live_stream?channel=UCnacnZiUscX6jrVKu78Notg&autoplay=1&mute=1&playsinline=1"
-            title="황교안TV 실시간 방송"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
+      <div class="livetv reveal lv-toggle" style="--delay:.04s" id="live-hwang" data-key="hwang" data-cid="UCnacnZiUscX6jrVKu78Notg" data-name="황교안TV" hidden>
+        <div class="lvlabel">📡 황교안TV <span class="lvsub">@Hwang_Kyo-ahn_TV</span> <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvbox"></div>
       </div>
 
-      <div class="livetv reveal" style="--delay:.07s">
-        <div class="lvlabel">📡 한길뉴스 <span class="lvsub">@1waynews-jhg</span></div>
-        <div class="lvbox">
-          <iframe src="https://www.youtube.com/embed/live_stream?channel=UC_iT-dQV96rPviS4G4p5b9A&autoplay=1&mute=1&playsinline=1"
-            title="한길뉴스 실시간 방송"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
+      <div class="livetv reveal lv-toggle" style="--delay:.07s" id="live-hangil" data-key="hangil" data-cid="UC_iT-dQV96rPviS4G4p5b9A" data-name="한길뉴스" hidden>
+        <div class="lvlabel">📡 한길뉴스 <span class="lvsub">@1waynews-jhg</span> <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvbox"></div>
       </div>
 
-      <div class="livetv reveal" style="--delay:.1s">
-        <div class="lvlabel">📡 자유대학 <span class="lvsub">현장 촬영 · @Freeuniv0116</span></div>
-        <div class="lvbox">
-          <iframe src="https://www.youtube.com/embed/live_stream?channel=UCCnkoO8v5K8B2_AUjbtKlYQ&autoplay=1&mute=1&playsinline=1"
-            title="자유대학 실시간 방송"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
+      <div class="livetv reveal lv-toggle" style="--delay:.1s" id="live-freeuniv" data-key="freeuniv" data-cid="UCCnkoO8v5K8B2_AUjbtKlYQ" data-name="자유대학" hidden>
+        <div class="lvlabel">📡 자유대학 <span class="lvsub">현장 촬영 · @Freeuniv0116</span> <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvbox"></div>
       </div>
 
-      <div class="livetv reveal" style="--delay:.13s">
-        <div class="lvlabel">📡 일론머스크 <span class="lvsub">@elongmuskkk</span></div>
-        <div class="lvbox">
-          <iframe src="https://www.youtube.com/embed/live_stream?channel=UCWS0tefWL5UpQsZI2yc8ASg&autoplay=1&mute=1&playsinline=1"
-            title="@elongmuskkk 실시간 방송"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
+      <div class="livetv reveal lv-toggle" style="--delay:.13s" id="live-elonmusk" data-key="elonmusk" data-cid="UCWS0tefWL5UpQsZI2yc8ASg" data-name="일론머스크" hidden>
+        <div class="lvlabel">📡 일론머스크 <span class="lvsub">@elongmuskkk</span> <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvbox"></div>
       </div>
 
-      <div class="livetv reveal" style="--delay:.16s">
-        <div class="lvlabel">📡 Korea Narrative Live</div>
-        <div class="lvbox">
-          <iframe src="https://www.youtube.com/embed/live_stream?channel=UC2vZ-y5LAIaqJt5aIp9o-Tg&autoplay=1&mute=1&playsinline=1"
-            title="Korea Narrative Live 실시간 방송"
-            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-        </div>
+      <div class="livetv reveal lv-toggle" style="--delay:.16s" id="live-knl" data-key="knl" data-cid="UC2vZ-y5LAIaqJt5aIp9o-Tg" data-name="Korea Narrative Live" hidden>
+        <div class="lvlabel">📡 Korea Narrative Live <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvbox"></div>
+      </div>
+
+      <div class="lv-empty" id="lvEmpty" hidden>
+        <div class="lv-empty-icon">📺</div>
+        <div class="lv-empty-title">현재 진행 중인 라이브가 없습니다</div>
+        <div class="lv-empty-sub">라이브 시작되면 자동으로 표시됩니다.<br /><span style="opacity:.6">잠시 후 다시 확인해주세요.</span></div>
       </div>
     </section>
 
@@ -3017,6 +3106,97 @@
       });
     }
 
+    /* === 라이브 채널 자동 표시/숨김 === */
+    const LIVE_CHANNELS = [
+      { key: 'hwang', cid: 'UCnacnZiUscX6jrVKu78Notg', name: '황교안TV' },
+      { key: 'hangil', cid: 'UC_iT-dQV96rPviS4G4p5b9A', name: '한길뉴스' },
+      { key: 'freeuniv', cid: 'UCCnkoO8v5K8B2_AUjbtKlYQ', name: '자유대학' },
+      { key: 'elonmusk', cid: 'UCWS0tefWL5UpQsZI2yc8ASg', name: '일론머스크' },
+      { key: 'knl', cid: 'UC2vZ-y5LAIaqJt5aIp9o-Tg', name: 'Korea Narrative Live' }
+    ];
+    function buildLiveIframe(cid, name) {
+      return `<iframe src="https://www.youtube.com/embed/live_stream?channel=${cid}&autoplay=1&mute=1&playsinline=1"
+        title="${name} 실시간 방송"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+    }
+    function renderLiveStatus(status) {
+      let visibleCount = 0;
+      LIVE_CHANNELS.forEach(ch => {
+        const el = document.getElementById(`live-${ch.key}`);
+        if (!el) return;
+        const isLive = status[ch.key] === true;
+        const box = el.querySelector('.lvbox');
+        if (isLive) {
+          el.hidden = false;
+          if (box && !box.querySelector('iframe')) {
+            box.innerHTML = buildLiveIframe(ch.cid, ch.name);
+          }
+          visibleCount++;
+        } else {
+          el.hidden = true;
+          if (box) box.innerHTML = '';
+        }
+      });
+      const emptyEl = document.getElementById('lvEmpty');
+      if (emptyEl) emptyEl.hidden = visibleCount > 0;
+    }
+    onValue(ref(db, 'liveStatus'), snap => {
+      renderLiveStatus(snap.val() || {});
+    }, err => {
+      console.warn('liveStatus 구독 실패', err);
+      /* 권한 거부 시 모두 표시 (fallback) */
+      const all = {};
+      LIVE_CHANNELS.forEach(ch => { all[ch.key] = true; });
+      renderLiveStatus(all);
+    });
+
+    /* === 운영자 패널 (라이브 토글) — ?admin=resetkr0603 으로 활성화 === */
+    if (new URLSearchParams(location.search).get('admin') === 'resetkr0603') {
+      const adminBox = document.createElement('div');
+      adminBox.className = 'live-admin';
+      adminBox.innerHTML = `
+        <h4>🛡️ 운영자 — 라이브 토글</h4>
+        <div class="la-list">
+          ${LIVE_CHANNELS.map(c => `
+            <label class="la-row" data-key="${c.key}">
+              <input type="checkbox" data-key="${c.key}" />
+              <span class="la-name">${c.name}</span>
+              <span class="la-dot"></span>
+            </label>
+          `).join('')}
+        </div>
+        <button class="la-close" type="button">닫기</button>
+      `;
+      document.body.appendChild(adminBox);
+
+      /* 현재 상태로 체크박스 초기화 + 실시간 동기화 */
+      onValue(ref(db, 'liveStatus'), snap => {
+        const status = snap.val() || {};
+        adminBox.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+          const k = cb.dataset.key;
+          cb.checked = status[k] === true;
+          cb.closest('.la-row').classList.toggle('on', cb.checked);
+        });
+      });
+
+      /* 체크박스 → Firebase 쓰기 */
+      adminBox.addEventListener('change', async e => {
+        const cb = e.target;
+        if (cb.tagName !== 'INPUT') return;
+        const key = cb.dataset.key;
+        try {
+          await set(ref(db, `liveStatus/${key}`), cb.checked);
+        } catch (err) {
+          alert('토글 실패: ' + err.message);
+        }
+      });
+
+      adminBox.querySelector('.la-close').addEventListener('click', () => {
+        adminBox.remove();
+      });
+    }
+
     /* === 시민 투표 (Civic Poll) === */
     const POLL_ID = 'poll_001';
     const POLL_DEFAULT = {
@@ -3024,15 +3204,16 @@
       options: {
         a: '선관위',
         b: '광화문',
-        c: '잠실 그대로 유지 (여기서 끝장)'
+        c: '잠실 (그대로 유지... 여기서 끝장!!)'
       }
     };
-    const POLL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+    /* 마감: 2026-06-07 00:00:00 KST (내일 자정) */
+    const POLL_EXPIRES_AT = new Date('2026-06-07T00:00:00+09:00').getTime();
     const pollCard = document.getElementById('pollCard');
     let myVote = null;
     let pollData = null;
 
-    /* 첫 로드 시 투표 노드가 없으면 자동 생성 */
+    /* 첫 로드 시 투표 노드가 없으면 자동 생성. 기존 노드면 옵션 텍스트·만료 동기화 */
     async function ensurePollExists() {
       try {
         const pRef = ref(db, `polls/${POLL_ID}`);
@@ -3044,12 +3225,27 @@
             votes: { a: 0, b: 0, c: 0 },
             active: true,
             createdAt: serverTimestamp(),
-            expiresAt: Date.now() + POLL_DURATION_MS
+            expiresAt: POLL_EXPIRES_AT
           });
           console.log('투표 생성:', POLL_ID);
+          return;
+        }
+        /* 기존 노드 — 텍스트/만료 마이그레이션 */
+        const data = snap.val();
+        const updates = {};
+        if (data.question !== POLL_DEFAULT.question) updates['question'] = POLL_DEFAULT.question;
+        Object.keys(POLL_DEFAULT.options).forEach(k => {
+          if ((data.options || {})[k] !== POLL_DEFAULT.options[k]) {
+            updates[`options/${k}`] = POLL_DEFAULT.options[k];
+          }
+        });
+        if (data.expiresAt !== POLL_EXPIRES_AT) updates['expiresAt'] = POLL_EXPIRES_AT;
+        if (Object.keys(updates).length > 0) {
+          await update(pRef, updates);
+          console.log('투표 마이그레이션:', updates);
         }
       } catch (e) {
-        console.warn('투표 생성 실패', e);
+        console.warn('투표 생성/마이그레이션 실패', e);
       }
     }
 
@@ -3120,6 +3316,11 @@
       if (myVote === optKey) return;
       const oldVote = myVote;
 
+      /* 옵티미스틱 UI — 즉시 체크 표시 갱신 */
+      myVote = optKey;
+      setLocalVote(optKey);
+      renderPoll();
+
       pollCard.classList.add('poll-changed');
       setTimeout(() => pollCard.classList.remove('poll-changed'), 500);
 
@@ -3129,9 +3330,11 @@
           await runTransaction(ref(db, `polls/${POLL_ID}/votes/${oldVote}`), cur => Math.max(0, (cur || 0) - 1));
         }
         await set(ref(db, `polls/${POLL_ID}/voters/${myUid}`), optKey);
-        myVote = optKey;
-        setLocalVote(optKey);
       } catch (e) {
+        /* 실패 시 롤백 */
+        myVote = oldVote;
+        if (oldVote) setLocalVote(oldVote); else try { localStorage.removeItem(`vote_${POLL_ID}`); } catch { }
+        renderPoll();
         console.error('투표 실패', e);
         alert('투표 실패. 잠시 후 다시 시도해주세요.');
       }

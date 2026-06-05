@@ -1009,14 +1009,11 @@
     .chat .cmsg.dev .cn { color: var(--gold) }
     .chat .cmsg .dev-badge {
       display: inline-block;
-      background: linear-gradient(90deg, var(--accent), #ff6b3a);
-      color: #fff;
-      font-size: 10px;
-      font-weight: 900;
-      padding: 2px 7px;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      font-size: 11px;
+      padding: 2px 5px;
       border-radius: 5px;
-      margin-right: 7px;
-      letter-spacing: .5px;
+      margin-right: 6px;
       box-shadow: 0 2px 6px rgba(255, 32, 48, .35);
       vertical-align: 1px
     }
@@ -2234,8 +2231,8 @@
       const isMe = data.uid && data.uid === myUid;
       const div = document.createElement('div');
       div.className = 'cmsg' + (isMe ? ' me' : '') + (isDev ? ' dev' : '');
-      const badgeHtml = isDev ? '<span class="dev-badge">👨‍💻 개발자</span>' : '';
-      const displayName = isDev ? '개발자' : (data.name || '익명');
+      const badgeHtml = isDev ? '<span class="dev-badge">🛡️</span>' : '';
+      const displayName = isDev ? '개발자(본인)' : (data.name || '익명');
       div.innerHTML = `<div>${badgeHtml}<span class="cn">${esc(displayName)}</span><span class="ct">${esc(data.text || '')}</span></div><div class="ctime">${fmtTime(data.time)}</div>`;
       msgsEl.appendChild(div);
       count++;

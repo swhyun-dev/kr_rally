@@ -2560,6 +2560,20 @@
     updateLiveTime();
     setInterval(updateLiveTime, 30000);
 
+    /* === 누적 응원 메시지 / 현장 제보 카운트 (limitToLast 영향 X) === */
+    const totalMsgsRef = ref(db, 'stats/totalMessages');
+    const totalReportsRef = ref(db, 'stats/totalReports');
+    onValue(totalMsgsRef, snap => {
+      const n = snap.val() || 0;
+      const el = document.getElementById('cpMsgs');
+      if (el) el.textContent = n.toLocaleString('ko-KR');
+    }, err => console.warn('totalMessages 구독 실패', err));
+    onValue(totalReportsRef, snap => {
+      const n = snap.val() || 0;
+      const el = document.getElementById('rTotalCount');
+      if (el) el.textContent = n.toLocaleString('ko-KR');
+    }, err => console.warn('totalReports 구독 실패', err));
+
     /* 누적 방문 카운트 표시 (사회증거) */
     function loadVisits() {
       const el = document.getElementById('cpVisits');
@@ -2625,6 +2639,7 @@
             time: serverTimestamp(),
             uid: myUid || 'anon'
           });
+          runTransaction(totalMsgsRef, cur => (cur || 0) + 1).catch(() => { });
           lastSent = now;
           lastText = msg;
         } catch (e) {
@@ -2687,9 +2702,7 @@
       if (!connected) { connected = true; countEl.textContent = `💬 ${count}`; }
       else countEl.textContent = `💬 ${count}`;
 
-      /* 사회증거 카드 메시지 수 갱신 */
-      const cpMsgsEl = document.getElementById('cpMsgs');
-      if (cpMsgsEl) cpMsgsEl.textContent = count.toLocaleString('ko-KR');
+      /* (사회증거 카드 메시지 수는 stats/totalMessages 에서 별도 구독) */
 
       /* 새 메시지 토스트 (첫 로드 끝난 뒤 + 본인 메시지 아닐 때 + 채팅 안 보일 때) */
       if (!firstLoad && data.uid !== myUid && !document.hidden) {
@@ -2739,6 +2752,7 @@
           time: serverTimestamp(),
           uid: myUid || 'anon'
         });
+        runTransaction(totalMsgsRef, cur => (cur || 0) + 1).catch(() => { });
         localStorage.setItem('chatName', name);
         lastSent = now;
         lastText = text;
@@ -2938,6 +2952,7 @@
             uid: myUid,
             reports: 0
           });
+          runTransaction(totalReportsRef, cur => (cur || 0) + 1).catch(() => { });
 
           lastReportTime = now;
           localStorage.setItem('chatName', name);
@@ -3036,7 +3051,7 @@
       if (rEmpty && !rEmpty.hidden) { rEmpty.hidden = true; }
       rGrid.insertBefore(card, rGrid.firstChild);
       reportCount++;
-      if (rTotalCountEl) rTotalCountEl.textContent = reportCount.toString();
+      /* 총 개수 표시는 stats/totalReports 에서 onValue로 별도 갱신 */
 
       /* 댓글 구독 */
       const cmtRef = query(ref(db, `reports/${id}/comments`), limitToLast(20));

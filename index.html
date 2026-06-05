@@ -1001,6 +1001,25 @@
       margin-right: 6px
     }
     .chat .cmsg.me .cn { color: var(--gold) }
+    .chat .cmsg.dev {
+      background: linear-gradient(90deg, rgba(255, 213, 74, .12), rgba(255, 32, 48, .04));
+      border-left-color: var(--gold);
+      border-left-width: 3px
+    }
+    .chat .cmsg.dev .cn { color: var(--gold) }
+    .chat .cmsg .dev-badge {
+      display: inline-block;
+      background: linear-gradient(90deg, var(--accent), #ff6b3a);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 5px;
+      margin-right: 7px;
+      letter-spacing: .5px;
+      box-shadow: 0 2px 6px rgba(255, 32, 48, .35);
+      vertical-align: 1px
+    }
     .chat .cmsg .ct {
       font-size: 14px;
       color: #fff;
@@ -2174,6 +2193,9 @@
       });
     });
 
+    /* 개발자 비밀 닉네임 (이 닉네임으로 작성하면 개발자 뱃지 표시) */
+    const DEV_NICK = '__개발자__';
+
     /* 한글 욕설 클라이언트 필터 (기본 리스트) */
     const blocked = ['시발', '씨발', 'ㅅㅂ', '병신', 'ㅂㅅ', '개새', '개색', '좆', '미친', '닥쳐', '꺼져', '죽어', '지랄', 'ㅈㄹ', '존나', 'ㅈㄴ', '빨아', '꼴려', '새끼', 'ㅅㄲ'];
     function hasBlock(s) {
@@ -2208,9 +2230,13 @@
     let connected = false;
     onChildAdded(msgsRef, snap => {
       const data = snap.val() || {};
+      const isDev = (data.name || '') === DEV_NICK;
+      const isMe = data.uid && data.uid === myUid;
       const div = document.createElement('div');
-      div.className = 'cmsg' + (data.uid && data.uid === myUid ? ' me' : '');
-      div.innerHTML = `<div><span class="cn">${esc(data.name || '익명')}</span><span class="ct">${esc(data.text || '')}</span></div><div class="ctime">${fmtTime(data.time)}</div>`;
+      div.className = 'cmsg' + (isMe ? ' me' : '') + (isDev ? ' dev' : '');
+      const badgeHtml = isDev ? '<span class="dev-badge">👨‍💻 개발자</span>' : '';
+      const displayName = isDev ? '개발자' : (data.name || '익명');
+      div.innerHTML = `<div>${badgeHtml}<span class="cn">${esc(displayName)}</span><span class="ct">${esc(data.text || '')}</span></div><div class="ctime">${fmtTime(data.time)}</div>`;
       msgsEl.appendChild(div);
       count++;
 

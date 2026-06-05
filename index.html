@@ -2563,15 +2563,29 @@
     /* === 누적 응원 메시지 / 현장 제보 카운트 (limitToLast 영향 X) === */
     const totalMsgsRef = ref(db, 'stats/totalMessages');
     const totalReportsRef = ref(db, 'stats/totalReports');
-    onValue(totalMsgsRef, snap => {
-      const n = snap.val() || 0;
+    let statsMsgCount = null;
+    let statsReportCount = null;
+    function updateCpMsgs() {
       const el = document.getElementById('cpMsgs');
-      if (el) el.textContent = n.toLocaleString('ko-KR');
+      if (!el) return;
+      const localCount = typeof count !== 'undefined' ? count : 0;
+      const display = Math.max(statsMsgCount || 0, localCount);
+      if (display > 0) el.textContent = display.toLocaleString('ko-KR');
+    }
+    function updateRTotalCount() {
+      const el = document.getElementById('rTotalCount');
+      if (!el) return;
+      const localCount = typeof reportCount !== 'undefined' ? reportCount : 0;
+      const display = Math.max(statsReportCount || 0, localCount);
+      el.textContent = display.toLocaleString('ko-KR');
+    }
+    onValue(totalMsgsRef, snap => {
+      statsMsgCount = snap.val();
+      updateCpMsgs();
     }, err => console.warn('totalMessages 구독 실패', err));
     onValue(totalReportsRef, snap => {
-      const n = snap.val() || 0;
-      const el = document.getElementById('rTotalCount');
-      if (el) el.textContent = n.toLocaleString('ko-KR');
+      statsReportCount = snap.val();
+      updateRTotalCount();
     }, err => console.warn('totalReports 구독 실패', err));
 
     /* 누적 방문 카운트 표시 (사회증거) */
@@ -2702,7 +2716,8 @@
       if (!connected) { connected = true; countEl.textContent = `💬 ${count}`; }
       else countEl.textContent = `💬 ${count}`;
 
-      /* (사회증거 카드 메시지 수는 stats/totalMessages 에서 별도 구독) */
+      /* 사회증거 카드 메시지 수 갱신 (stats 노드 없을 때 fallback) */
+      updateCpMsgs();
 
       /* 새 메시지 토스트 (첫 로드 끝난 뒤 + 본인 메시지 아닐 때 + 채팅 안 보일 때) */
       if (!firstLoad && data.uid !== myUid && !document.hidden) {
@@ -3051,7 +3066,7 @@
       if (rEmpty && !rEmpty.hidden) { rEmpty.hidden = true; }
       rGrid.insertBefore(card, rGrid.firstChild);
       reportCount++;
-      /* 총 개수 표시는 stats/totalReports 에서 onValue로 별도 갱신 */
+      updateRTotalCount();
 
       /* 댓글 구독 */
       const cmtRef = query(ref(db, `reports/${id}/comments`), limitToLast(20));

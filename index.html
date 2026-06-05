@@ -843,6 +843,13 @@
     .quick-cheer .qc-btn:hover { background: rgba(255, 32, 48, .15); border-color: var(--accent) }
     .quick-cheer .qc-btn:active { transform: scale(.88) }
     .quick-cheer .qc-btn:disabled { opacity: .4; cursor: not-allowed }
+    .quick-cheer .qc-btn .qc-flag {
+      width: 24px;
+      height: 24px;
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 1px 3px rgba(255, 32, 48, .3))
+    }
     @keyframes qcShake {
       0%, 100% { transform: translateX(0) }
       25% { transform: translateX(-4px) }
@@ -1739,7 +1746,7 @@
           <div class="quick-cheer">
             <div class="qc-title">⚡ 빠른 응원 (1탭 전송)</div>
             <div class="qc-grid">
-              <button class="qc-btn" type="button" data-msg="🇰🇷 대한민국 화이팅!">🇰🇷</button>
+              <button class="qc-btn" type="button" data-msg="자유 대한민국 화이팅!"><img class="qc-flag" src="flag.svg" alt="태극기" /></button>
               <button class="qc-btn" type="button" data-msg="🔥 이제부터 시작입니다!">🔥</button>
               <button class="qc-btn" type="button" data-msg="👊 함께합니다!">👊</button>
               <button class="qc-btn" type="button" data-msg="🙌 응원합니다!">🙌</button>

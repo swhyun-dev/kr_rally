@@ -117,19 +117,16 @@
       }
     }
 
-    /* === 사이렌 효과 === */
-    /* 위·아래 끝 비상 라인 */
+    /* === 상단·하단 빨간 라인 (정적, 차분) === */
     body::before {
       content: "";
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
+      height: 3px;
       z-index: 1001;
-      background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent), var(--gold), var(--accent));
-      background-size: 300% 100%;
-      animation: edgemove 2s linear infinite
+      background: var(--accent)
     }
 
     body::after {
@@ -138,142 +135,55 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 4px;
+      height: 3px;
       z-index: 1001;
-      background: linear-gradient(90deg, var(--gold), var(--accent), var(--gold), var(--accent), var(--gold));
-      background-size: 300% 100%;
-      animation: edgemove 2s linear infinite reverse
+      background: var(--accent)
     }
 
-    @keyframes edgemove {
-      0% {
-        background-position: 0 0
-      }
+    /* 페이지 전체 플래시 비활성화 */
+    .siren-flash { display: none }
 
-      100% {
-        background-position: 300% 0
-      }
-    }
-
-    @keyframes edgeblink {
-      0% {
-        opacity: 1
-      }
-
-      100% {
-        opacity: .45
-      }
-    }
-
-    /* 페이지 전체 빨간 플래시 (가끔) */
-    .siren-flash {
-      position: fixed;
-      inset: 0;
-      background: #ff2030;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 998;
-      mix-blend-mode: screen;
-      animation: sirenflash 8s ease-in-out infinite
-    }
-
-    @keyframes sirenflash {
-
-      0%,
-      94%,
-      100% {
-        opacity: 0
-      }
-
-      97% {
-        opacity: .06
-      }
-    }
-
-    /* 긴급 띠 — 위험 테이프(사선) 모션 + 안쪽 깜빡임 */
+    /* 긴급 띠 (정돈된 빨간 바) */
     .urgent {
       margin: 0 -18px;
       padding: 0;
       position: relative;
-      overflow: hidden;
-      background: repeating-linear-gradient(45deg,
-          var(--accent) 0, var(--accent) 22px,
-          var(--gold) 22px, var(--gold) 44px);
-      background-size: 62.2px 62.2px;
-      animation: sirenmove 1.6s linear infinite;
-      border-top: 2px solid var(--accent-deep);
-      border-bottom: 2px solid var(--accent-deep)
+      background: var(--accent-deep);
+      border-top: 1px solid var(--accent);
+      border-bottom: 1px solid var(--accent)
     }
 
     .urgent .inner {
-      padding: 13px 18px;
-      background: rgba(0, 0, 0, .85);
+      padding: 12px 18px;
       color: #fff;
       text-align: center;
-      font-size: 13.5px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      animation: innerblink 2.5s ease-in-out infinite
-    }
-
-    @keyframes sirenmove {
-      0% {
-        background-position: 0 0
-      }
-
-      100% {
-        background-position: -62.2px 0
-      }
-    }
-
-    @keyframes innerblink {
-      0% {
-        background: rgba(0, 0, 0, .88);
-        color: #fff
-      }
-
-      100% {
-        background: rgba(180, 0, 18, .92);
-        color: var(--gold)
-      }
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .5px
     }
 
     .urgent .dot {
       display: inline-block;
-      width: 10px;
-      height: 10px;
-      background: #fff;
+      width: 8px;
+      height: 8px;
+      background: var(--gold);
       border-radius: 50%;
       margin-right: 8px;
       vertical-align: 1px;
-      animation: pulse 1.6s ease-in-out infinite;
-      box-shadow: 0 0 10px #fff, 0 0 20px var(--gold)
+      animation: pulse 2s ease-in-out infinite
     }
 
     .urgent .live {
       display: inline-block;
       background: #fff;
-      color: #000;
+      color: var(--accent);
       font-size: 11px;
-      padding: 2px 9px;
+      padding: 2px 8px;
       border-radius: 5px;
-      letter-spacing: 2px;
+      letter-spacing: 1.5px;
       margin-right: 8px;
       vertical-align: 1px;
-      animation: liveflick 1.4s ease-in-out infinite;
       font-weight: 900
-    }
-
-    @keyframes liveflick {
-      0% {
-        background: #fff;
-        color: #000
-      }
-
-      100% {
-        background: var(--accent);
-        color: #fff
-      }
     }
 
     /* HERO — 가장 큰 외침 */
@@ -293,20 +203,7 @@
       border-radius: 7px;
       letter-spacing: 2px;
       margin-bottom: 18px;
-      border: 1px solid rgba(255, 213, 74, .35);
-      animation: tagblink 2.5s ease-in-out infinite
-    }
-
-    @keyframes tagblink {
-      0% {
-        background: var(--gold-soft);
-        color: var(--gold)
-      }
-
-      100% {
-        background: var(--gold);
-        color: #000
-      }
+      border: 1px solid rgba(255, 213, 74, .35)
     }
 
     .hero h1 {
@@ -315,41 +212,13 @@
       letter-spacing: -1.5px;
       line-height: 1.1;
       color: #fff;
-      animation: textpulse 3s ease-in-out infinite
-    }
-
-    @keyframes textpulse {
-
-      0%,
-      100% {
-        text-shadow: 0 4px 24px rgba(255, 32, 48, .4)
-      }
-
-      50% {
-        text-shadow: 0 4px 36px rgba(255, 32, 48, .95), 0 0 20px rgba(255, 32, 48, .7)
-      }
+      text-shadow: 0 2px 18px rgba(255, 32, 48, .25)
     }
 
     .hero h1 .em {
       color: var(--accent);
       display: inline-block;
-      animation: empulse 2.5s ease-in-out infinite
-    }
-
-    @keyframes empulse {
-
-      0%,
-      100% {
-        color: var(--accent);
-        text-shadow: 0 0 24px var(--accent), 0 0 48px var(--accent-dark);
-        transform: scale(1)
-      }
-
-      50% {
-        color: #fff;
-        text-shadow: 0 0 30px var(--accent), 0 0 60px #fff;
-        transform: scale(1.04)
-      }
+      text-shadow: 0 0 18px rgba(255, 32, 48, .45)
     }
 
     .hero .lead {
@@ -362,18 +231,7 @@
 
     .hero .lead b {
       color: var(--gold);
-      font-weight: 900;
-      animation: goldblink 2s ease-in-out infinite
-    }
-
-    @keyframes goldblink {
-      0% {
-        color: var(--gold)
-      }
-
-      100% {
-        color: #fff
-      }
+      font-weight: 900
     }
 
     /* 거대 강조 카운트다운 / 메인 메시지 박스 */
@@ -385,8 +243,7 @@
       text-align: center;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 20px 48px rgba(255, 32, 48, .35);
-      animation: glow 2.5s ease-in-out infinite
+      box-shadow: 0 12px 30px rgba(255, 32, 48, .18)
     }
 
     .megabox::before {
@@ -461,8 +318,7 @@
       text-align: center;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 16px 40px rgba(255, 32, 48, .3);
-      animation: glow 2.5s ease-in-out infinite
+      box-shadow: 0 10px 28px rgba(255, 32, 48, .18)
     }
     .callout::before {
       content: "❗";
@@ -721,8 +577,7 @@
     .btn.primary {
       background: var(--accent);
       color: #fff;
-      box-shadow: 0 8px 24px rgba(255, 32, 48, .4);
-      animation: glow 3s ease-in-out infinite
+      box-shadow: 0 6px 18px rgba(255, 32, 48, .25)
     }
 
     .btn.outline {
@@ -1092,6 +947,61 @@
       margin-top: 10px;
       line-height: 1.55
     }
+
+    /* 변동 안내 메모 */
+    .update-note {
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: rgba(255, 213, 74, .1);
+      border: 1px dashed rgba(255, 213, 74, .4);
+      border-radius: 10px;
+      font-size: 12.5px;
+      color: var(--gold);
+      line-height: 1.55;
+      text-align: center
+    }
+    .update-note b { color: #fff; font-weight: 800 }
+
+    /* 유튜브 채널 바로가기 */
+    .yt-channels {
+      margin-top: 14px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 14px
+    }
+    .yt-title {
+      font-size: 13.5px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 12px;
+      text-align: center;
+      letter-spacing: -.3px
+    }
+    .yt-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px
+    }
+    .yt-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 6px;
+      background: rgba(255, 32, 48, .08);
+      border: 1px solid rgba(255, 32, 48, .3);
+      border-radius: 11px;
+      text-decoration: none;
+      transition: background .2s, border-color .2s, transform .12s;
+      min-height: 90px;
+      gap: 4px
+    }
+    .yt-btn:hover { background: rgba(255, 32, 48, .14); border-color: var(--accent) }
+    .yt-btn:active { transform: scale(.97) }
+    .yt-btn .yt-icon { font-size: 22px; line-height: 1 }
+    .yt-btn .yt-name { font-size: 12.5px; font-weight: 900; color: #fff; letter-spacing: -.3px; text-align: center; line-height: 1.2 }
+    .yt-btn .yt-sub { font-size: 10px; color: var(--gold); font-weight: 700; letter-spacing: 0; text-align: center; line-height: 1.2 }
 
     /* 준비물 */
     .prep {
@@ -1615,6 +1525,11 @@
           </div>
         </div>
         <a class="map" href="https://map.naver.com/p/search/잠실 핸드볼 경기장" target="_blank" rel="noopener">📍 네이버지도에서 보기 ↗</a>
+
+        <div class="update-note">
+          📌 <b>장소·시간 변동 시 바로바로 업데이트하겠습니다.</b><br />
+          이 페이지를 새로고침하면 최신 정보가 표시됩니다.
+        </div>
       </div>
 
       <!-- 준비물 -->
@@ -1646,12 +1561,33 @@
       <p class="lead reveal" style="--delay:.06s">잠실 현장 생중계 · 소리는 영상에서 음소거 해제로 켜주세요</p>
 
       <div class="livetv reveal" style="--delay:.05s">
-        <div class="lvlabel">📍 잠실 현재상황 <span class="lvsub">현장 생중계</span></div>
+        <div class="lvlabel">📍 잠실 현재상황 <span class="lvsub">자유대학 · 잠실 촬영 중</span></div>
         <div class="lvbox">
           <iframe src="https://www.youtube.com/embed/KGTtEUs8BdI?autoplay=1&mute=1&playsinline=1"
             title="잠실 현재상황 실시간 방송"
             allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div class="yt-channels reveal" style="--delay:.1s">
+        <div class="yt-title">📺 다른 보수 채널 바로가기</div>
+        <div class="yt-grid">
+          <a class="yt-btn" href="https://www.youtube.com/@Freeuniv0116" target="_blank" rel="noopener">
+            <span class="yt-icon">🎓</span>
+            <span class="yt-name">자유대학</span>
+            <span class="yt-sub">@Freeuniv0116</span>
+          </a>
+          <a class="yt-btn" href="https://www.youtube.com/@1waynews-jhg" target="_blank" rel="noopener">
+            <span class="yt-icon">📰</span>
+            <span class="yt-name">한길뉴스</span>
+            <span class="yt-sub">@1waynews-jhg</span>
+          </a>
+          <a class="yt-btn" href="https://www.youtube.com/@penn1TV" target="_blank" rel="noopener">
+            <span class="yt-icon">🎙️</span>
+            <span class="yt-name">펜앤마이크TV</span>
+            <span class="yt-sub">@penn1TV</span>
+          </a>
         </div>
       </div>
     </section>

@@ -2458,29 +2458,29 @@
     <!-- 실시간 방송 (라이브 진행 중인 채널만 표시) -->
     <section class="section" id="liveSection">
       <h2 class="reveal">📺 <span class="em">실시간</span> 방송</h2>
-      <p class="lead reveal" style="--delay:.06s">🔴 <b style="color:var(--gold)">라이브 진행 중인 채널만 표시</b> · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
+      <p class="lead reveal" style="--delay:.06s">🔴 보수 유튜브 채널 라이브 모음 · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
 
-      <div class="livetv reveal lv-toggle" style="--delay:.04s" id="live-hwang" data-key="hwang" data-cid="UCnacnZiUscX6jrVKu78Notg" data-name="황교안TV" hidden>
+      <div class="livetv reveal lv-toggle" style="--delay:.04s" id="live-hwang" data-key="hwang" data-cid="UCnacnZiUscX6jrVKu78Notg" data-name="황교안TV">
         <div class="lvlabel">📡 황교안TV <span class="lvsub">@Hwang_Kyo-ahn_TV</span> <span class="lvon">🔴 LIVE</span></div>
         <div class="lvbox"></div>
       </div>
 
-      <div class="livetv reveal lv-toggle" style="--delay:.07s" id="live-hangil" data-key="hangil" data-cid="UC_iT-dQV96rPviS4G4p5b9A" data-name="한길뉴스" hidden>
+      <div class="livetv reveal lv-toggle" style="--delay:.07s" id="live-hangil" data-key="hangil" data-cid="UC_iT-dQV96rPviS4G4p5b9A" data-name="한길뉴스">
         <div class="lvlabel">📡 한길뉴스 <span class="lvsub">@1waynews-jhg</span> <span class="lvon">🔴 LIVE</span></div>
         <div class="lvbox"></div>
       </div>
 
-      <div class="livetv reveal lv-toggle" style="--delay:.1s" id="live-freeuniv" data-key="freeuniv" data-cid="UCCnkoO8v5K8B2_AUjbtKlYQ" data-name="자유대학" hidden>
+      <div class="livetv reveal lv-toggle" style="--delay:.1s" id="live-freeuniv" data-key="freeuniv" data-cid="UCCnkoO8v5K8B2_AUjbtKlYQ" data-name="자유대학">
         <div class="lvlabel">📡 자유대학 <span class="lvsub">현장 촬영 · @Freeuniv0116</span> <span class="lvon">🔴 LIVE</span></div>
         <div class="lvbox"></div>
       </div>
 
-      <div class="livetv reveal lv-toggle" style="--delay:.13s" id="live-elonmusk" data-key="elonmusk" data-cid="UCWS0tefWL5UpQsZI2yc8ASg" data-name="일론머스크" hidden>
+      <div class="livetv reveal lv-toggle" style="--delay:.13s" id="live-elonmusk" data-key="elonmusk" data-cid="UCWS0tefWL5UpQsZI2yc8ASg" data-name="일론머스크">
         <div class="lvlabel">📡 일론머스크 <span class="lvsub">@elongmuskkk</span> <span class="lvon">🔴 LIVE</span></div>
         <div class="lvbox"></div>
       </div>
 
-      <div class="livetv reveal lv-toggle" style="--delay:.16s" id="live-knl" data-key="knl" data-cid="UC2vZ-y5LAIaqJt5aIp9o-Tg" data-name="Korea Narrative Live" hidden>
+      <div class="livetv reveal lv-toggle" style="--delay:.16s" id="live-knl" data-key="knl" data-cid="UC2vZ-y5LAIaqJt5aIp9o-Tg" data-name="Korea Narrative Live">
         <div class="lvlabel">📡 Korea Narrative Live <span class="lvon">🔴 LIVE</span></div>
         <div class="lvbox"></div>
       </div>
@@ -3125,7 +3125,8 @@
       LIVE_CHANNELS.forEach(ch => {
         const el = document.getElementById(`live-${ch.key}`);
         if (!el) return;
-        const isLive = status[ch.key] === true;
+        /* 기본: 표시 · 명시적으로 false 일 때만 숨김 (운영자가 오프라인 채널만 끔) */
+        const isLive = status[ch.key] !== false;
         const box = el.querySelector('.lvbox');
         if (isLive) {
           el.hidden = false;
@@ -3141,14 +3142,13 @@
       const emptyEl = document.getElementById('lvEmpty');
       if (emptyEl) emptyEl.hidden = visibleCount > 0;
     }
+    /* 초기 로드 시 모두 표시 (Firebase 노드 없거나 구독 전이어도) */
+    renderLiveStatus({});
     onValue(ref(db, 'liveStatus'), snap => {
       renderLiveStatus(snap.val() || {});
     }, err => {
       console.warn('liveStatus 구독 실패', err);
-      /* 권한 거부 시 모두 표시 (fallback) */
-      const all = {};
-      LIVE_CHANNELS.forEach(ch => { all[ch.key] = true; });
-      renderLiveStatus(all);
+      renderLiveStatus({});
     });
 
     /* === 운영자 패널 (라이브 토글) — ?admin=resetkr0603 으로 활성화 === */
@@ -3170,12 +3170,12 @@
       `;
       document.body.appendChild(adminBox);
 
-      /* 현재 상태로 체크박스 초기화 + 실시간 동기화 */
+      /* 현재 상태로 체크박스 초기화 + 실시간 동기화 (기본: 체크됨) */
       onValue(ref(db, 'liveStatus'), snap => {
         const status = snap.val() || {};
         adminBox.querySelectorAll('input[type="checkbox"]').forEach(cb => {
           const k = cb.dataset.key;
-          cb.checked = status[k] === true;
+          cb.checked = status[k] !== false;
           cb.closest('.la-row').classList.toggle('on', cb.checked);
         });
       });

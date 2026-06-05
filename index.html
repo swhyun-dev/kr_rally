@@ -1627,6 +1627,378 @@
       margin-top: 4px;
       font-size: 13px
     }
+
+    /* === 현장 제보 (Field Reports) === */
+    .reports-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+    .report-add-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent), #ff6b3a);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 22px;
+      font-weight: 900;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(255, 32, 48, .35);
+      transition: transform .15s
+    }
+    .report-add-btn:hover { transform: translateY(-2px) }
+    .report-add-btn:active { transform: translateY(0) }
+    .reports-safety {
+      background: rgba(255, 213, 74, .06);
+      border: 1px solid rgba(255, 213, 74, .2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--sub);
+      margin-bottom: 14px;
+      line-height: 1.6
+    }
+    .reports-safety b { color: var(--gold) }
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px
+    }
+    @media (min-width: 720px) {
+      .reports-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) }
+    }
+    .report-empty {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--sub);
+      border: 2px dashed var(--line);
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.7
+    }
+    .report-empty .big {
+      font-size: 36px;
+      display: block;
+      margin-bottom: 12px;
+      opacity: .5
+    }
+    .report-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: msgIn .35s ease;
+      position: relative
+    }
+    .report-card.hidden { display: none }
+    .report-photo {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #000;
+      overflow: hidden
+    }
+    .report-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      cursor: zoom-in
+    }
+    .report-loc {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0, 0, 0, .7);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .3px
+    }
+    .report-flag-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, .5);
+      color: #fff;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 11px;
+      opacity: .7
+    }
+    .report-flag-btn:hover { opacity: 1 }
+    .report-body {
+      padding: 12px 14px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+    .report-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--sub)
+    }
+    .report-meta .rname {
+      color: var(--text);
+      font-weight: 800;
+      font-size: 13px
+    }
+    .report-meta .rname.dev { color: var(--gold) }
+    .dev-badge-r {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-right: 4px;
+      vertical-align: 1px
+    }
+    .report-text {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text);
+      word-break: break-word
+    }
+    .report-cheers {
+      display: flex;
+      gap: 6px;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, .02);
+      border-top: 1px solid var(--line);
+      flex-wrap: wrap
+    }
+    .cheer-btn {
+      flex: 1;
+      min-width: 60px;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 8px 6px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      transition: all .15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px
+    }
+    .cheer-btn:hover {
+      border-color: var(--accent);
+      background: rgba(255, 32, 48, .06)
+    }
+    .cheer-btn.cheered {
+      background: rgba(255, 213, 74, .12);
+      border-color: var(--gold);
+      color: var(--gold)
+    }
+    .cheer-btn .cnum {
+      font-size: 11px;
+      font-weight: 800;
+      opacity: .9
+    }
+    .report-comments {
+      padding: 10px 14px 12px;
+      border-top: 1px solid var(--line);
+      background: rgba(0, 0, 0, .12)
+    }
+    .rc-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 140px;
+      overflow-y: auto;
+      margin-bottom: 8px;
+      font-size: 12px;
+      line-height: 1.5
+    }
+    .rc-item { color: var(--sub) }
+    .rc-item .rc-name {
+      color: var(--text);
+      font-weight: 700;
+      margin-right: 4px
+    }
+    .rc-item .rc-name.dev { color: var(--gold) }
+    .rc-empty {
+      color: var(--sub);
+      font-size: 12px;
+      opacity: .6;
+      text-align: center;
+      padding: 6px 0
+    }
+    .rc-form { display: flex; gap: 6px }
+    .rc-form input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      outline: none
+    }
+    .rc-form input:focus { border-color: var(--accent) }
+    .rc-form button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer
+    }
+    .rmodal[hidden] { display: none }
+    .rmodal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: wfade .25s
+    }
+    .rmodal-box {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 460px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 22px;
+      animation: modalin .3s
+    }
+    .rmodal-box h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+      color: var(--gold)
+    }
+    .rm-sub {
+      color: var(--sub);
+      font-size: 12px;
+      margin-bottom: 18px;
+      line-height: 1.5
+    }
+    .rmodal-box label {
+      display: block;
+      font-size: 12px;
+      color: var(--sub);
+      margin: 12px 0 6px;
+      font-weight: 700
+    }
+    .rmodal-box input[type="text"],
+    .rmodal-box select {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none
+    }
+    .rmodal-box input:focus,
+    .rmodal-box select:focus { border-color: var(--accent) }
+    .file-area {
+      border: 2px dashed var(--line);
+      border-radius: 12px;
+      padding: 30px 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .15s
+    }
+    .file-area:hover {
+      border-color: var(--accent);
+      background: rgba(255, 32, 48, .04)
+    }
+    .file-area.has {
+      padding: 8px;
+      border-style: solid
+    }
+    .file-area input[type="file"] { display: none }
+    .fa-icon { font-size: 32px; display: block; margin-bottom: 8px }
+    .fa-hint { font-size: 13px; color: var(--sub); line-height: 1.5 }
+    .file-preview {
+      width: 100%;
+      border-radius: 8px;
+      max-height: 240px;
+      object-fit: contain;
+      display: block
+    }
+    .consent {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--sub);
+      line-height: 1.5;
+      margin-top: 14px;
+      padding: 10px;
+      background: rgba(255, 213, 74, .04);
+      border-radius: 8px
+    }
+    .consent input { margin-top: 2px; flex-shrink: 0 }
+    .rm-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 18px
+    }
+    .rm-actions button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: 14px;
+      border: none
+    }
+    .rm-cancel {
+      background: transparent;
+      border: 1px solid var(--line) !important;
+      color: var(--sub)
+    }
+    .rm-submit {
+      background: linear-gradient(135deg, var(--accent), #ff6b3a);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255, 32, 48, .3)
+    }
+    .rm-submit:disabled { opacity: .5; cursor: not-allowed }
+    .rlightbox[hidden] { display: none }
+    .rlightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .95);
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      cursor: zoom-out
+    }
+    .rlightbox img {
+      max-width: 100%;
+      max-height: 95vh;
+      object-fit: contain
+    }
   </style>
 </head>
 
@@ -1723,6 +2095,33 @@
         <button class="btn primary" onclick="openNav()">✊ 참여한다 / 길찾기 시작</button>
         <a class="btn gold" href="https://map.kakao.com/link/to/올림픽공원 핸드볼경기장,37.5207,127.1212" target="_blank" rel="noopener">🚌 교통편 (카카오맵 길찾기)</a>
         <button class="btn outline" onclick="copyLink()">🔗 링크 복사 (단톡·SNS에 공유)</button>
+      </div>
+    </section>
+
+    <!-- 현장 제보 (시민이 시민에게) -->
+    <section class="section" id="reportsSection">
+      <h2 class="reveal">📸 <span class="em">현장 제보</span></h2>
+      <p class="lead reveal" style="--delay:.06s">현장 시민이 직접 올린 사진입니다. 따뜻한 응원 한 번씩 부탁드립니다.</p>
+
+      <div class="reports-head reveal" style="--delay:.04s">
+        <button class="report-add-btn" type="button" id="openReportBtn">
+          📸 현장 제보하기
+        </button>
+        <div style="font-size:12px;color:var(--sub)">
+          <span id="rTotalCount">0</span>개의 현장 사진
+        </div>
+      </div>
+
+      <div class="reports-safety reveal" style="--delay:.05s">
+        ⚠️ <b>안전·인권 안내</b>: 본인이 직접 촬영한 사진만 게시해주세요. 타인의 얼굴이 식별되는 사진은 본인 동의를 받은 후 올려주세요. 신고가 누적되면 자동 숨김 처리됩니다.
+      </div>
+
+      <div class="reports-grid reveal" style="--delay:.06s" id="reportsGrid">
+        <div class="report-empty" id="reportsEmpty">
+          <span class="big">📷</span>
+          아직 현장 사진이 없습니다.<br />
+          <b style="color:var(--gold)">첫 번째 시민이 되어주세요!</b>
+        </div>
       </div>
     </section>
 
@@ -1951,6 +2350,50 @@
     <button class="go" onclick="openNav()">참여 →</button>
   </div>
 
+  <!-- 현장 제보 업로드 모달 -->
+  <div class="rmodal" id="reportModal" hidden>
+    <div class="rmodal-box">
+      <h3>📸 현장 제보하기</h3>
+      <div class="rm-sub">현장 사진 한 장으로 못 가신 분들께 감동을 전해주세요.</div>
+
+      <label>사진 (한 장)</label>
+      <div class="file-area" id="fileArea">
+        <input type="file" id="rPhoto" accept="image/*" capture="environment" />
+        <span class="fa-icon">📷</span>
+        <div class="fa-hint">탭하여 사진 촬영 또는 선택<br /><span style="font-size:11px;opacity:.7">최대 10MB · 자동 압축됨</span></div>
+      </div>
+
+      <label>닉네임</label>
+      <input type="text" id="rName" placeholder="자유시민 (선택)" maxlength="20" />
+
+      <label>위치</label>
+      <select id="rLoc">
+        <option value="잠실">📍 잠실 (티켓링크라이브아레나)</option>
+        <option value="광화문">📍 광화문</option>
+        <option value="중앙선관위">📍 중앙선관위 (과천)</option>
+        <option value="기타">📍 기타 / 직접 입력</option>
+      </select>
+
+      <label>한 줄 코멘트</label>
+      <input type="text" id="rText" placeholder="현장 분위기 한 줄 (최대 100자)" maxlength="100" />
+
+      <label class="consent">
+        <input type="checkbox" id="rConsent" />
+        <span>본인이 직접 촬영한 사진이며, 타인의 식별 가능한 모습이 포함된 경우 동의를 받았습니다. 부적절한 사진은 운영자가 즉시 삭제합니다.</span>
+      </label>
+
+      <div class="rm-actions">
+        <button type="button" class="rm-cancel" id="rmCancel">취소</button>
+        <button type="button" class="rm-submit" id="rmSubmit">제보 올리기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 사진 라이트박스 -->
+  <div class="rlightbox" id="rLightbox" hidden>
+    <img id="rLightboxImg" alt="현장 사진" />
+  </div>
+
   <!-- 새 메시지 토스트 -->
   <div class="msg-toast" id="msgToast" hidden>
     <span class="toast-icon">💬</span>
@@ -2048,7 +2491,8 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getDatabase, ref, push, set, remove, onDisconnect, query, limitToLast, onChildAdded, serverTimestamp, onValue, orderByChild } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, ref, push, set, remove, update, onDisconnect, query, limitToLast, onChildAdded, onChildChanged, runTransaction, serverTimestamp, onValue, orderByChild } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -2066,6 +2510,7 @@
     try { getAnalytics(app); } catch (e) { console.warn('Analytics init skipped', e); }
     const auth = getAuth(app);
     const db = getDatabase(app);
+    const storage = getStorage(app);
 
     let myUid = null;
     signInAnonymously(auth).catch(e => console.warn('익명 로그인 실패', e));
@@ -2346,6 +2791,406 @@
         }
       });
     }
+
+    /* === 현장 제보 (Field Reports) === */
+    const REPORT_LIMIT = 60;
+    const AUTO_HIDE_REPORTS = 3;
+    const rModal = document.getElementById('reportModal');
+    const rGrid = document.getElementById('reportsGrid');
+    const rEmpty = document.getElementById('reportsEmpty');
+    const rTotalCountEl = document.getElementById('rTotalCount');
+    const fileArea = document.getElementById('fileArea');
+    const rPhoto = document.getElementById('rPhoto');
+    const rName = document.getElementById('rName');
+    const rLoc = document.getElementById('rLoc');
+    const rText = document.getElementById('rText');
+    const rConsent = document.getElementById('rConsent');
+    const rmCancel = document.getElementById('rmCancel');
+    const rmSubmit = document.getElementById('rmSubmit');
+    const openReportBtn = document.getElementById('openReportBtn');
+    const rLightbox = document.getElementById('rLightbox');
+    const rLightboxImg = document.getElementById('rLightboxImg');
+
+    let pendingBlob = null;
+    let reportFirstLoad = true;
+    let reportCount = 0;
+    let lastReportTime = 0;
+    setTimeout(() => { reportFirstLoad = false; }, 2000);
+
+    /* 닉네임 자동 채움 */
+    if (rName) rName.value = localStorage.getItem('chatName') || '';
+
+    /* 모달 열기/닫기 */
+    function openReportModal() {
+      if (!rModal) return;
+      rModal.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+    function closeReportModal() {
+      if (!rModal) return;
+      rModal.hidden = true;
+      document.body.style.overflow = '';
+      pendingBlob = null;
+      rPhoto.value = '';
+      rText.value = '';
+      rConsent.checked = false;
+      fileArea.classList.remove('has');
+      fileArea.innerHTML = `
+        <input type="file" id="rPhoto" accept="image/*" capture="environment" />
+        <span class="fa-icon">📷</span>
+        <div class="fa-hint">탭하여 사진 촬영 또는 선택<br /><span style="font-size:11px;opacity:.7">최대 10MB · 자동 압축됨</span></div>
+      `;
+      attachPhotoInput();
+    }
+    if (openReportBtn) openReportBtn.addEventListener('click', openReportModal);
+    if (rmCancel) rmCancel.addEventListener('click', closeReportModal);
+    if (rModal) rModal.addEventListener('click', e => { if (e.target === rModal) closeReportModal(); });
+
+    /* 파일 영역 클릭 → 파일 선택 트리거 */
+    function attachPhotoInput() {
+      const input = document.getElementById('rPhoto');
+      const area = document.getElementById('fileArea');
+      if (!input || !area) return;
+      area.addEventListener('click', e => {
+        if (e.target.tagName === 'INPUT') return;
+        input.click();
+      });
+      input.addEventListener('change', async e => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (file.size > 10 * 1024 * 1024) { alert('10MB 이하 사진만 업로드 가능합니다.'); return; }
+        try {
+          const compressed = await compressImage(file);
+          pendingBlob = compressed;
+          const url = URL.createObjectURL(compressed);
+          area.classList.add('has');
+          area.innerHTML = `<img class="file-preview" src="${url}" alt="미리보기" />`;
+          /* 다시 누르면 변경 가능 — 새 input 만들기 */
+          const newInput = document.createElement('input');
+          newInput.type = 'file';
+          newInput.id = 'rPhoto';
+          newInput.accept = 'image/*';
+          newInput.capture = 'environment';
+          newInput.style.display = 'none';
+          area.appendChild(newInput);
+          attachPhotoInput();
+        } catch (err) {
+          console.error(err);
+          alert('이미지 처리 실패. 다른 사진으로 시도해주세요.');
+        }
+      });
+    }
+    attachPhotoInput();
+
+    /* 이미지 압축 (canvas, max 1080px, 0.75) */
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX = 1080;
+          let w = img.width, h = img.height;
+          if (w > h && w > MAX) { h = h * MAX / w; w = MAX; }
+          else if (h > MAX) { w = w * MAX / h; h = MAX; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob(b => b ? resolve(b) : reject(new Error('압축 실패')), 'image/jpeg', 0.75);
+        };
+        img.onerror = () => reject(new Error('이미지 로드 실패'));
+        img.src = URL.createObjectURL(file);
+      });
+    }
+
+    /* 제보 업로드 */
+    if (rmSubmit) {
+      rmSubmit.addEventListener('click', async () => {
+        if (!pendingBlob) { alert('사진을 선택해주세요.'); return; }
+        if (!rConsent.checked) { alert('동의 항목을 체크해주세요.'); return; }
+        const now = Date.now();
+        if (now - lastReportTime < 30000) {
+          alert(`도배 방지 — ${Math.ceil((30000 - (now - lastReportTime)) / 1000)}초 후 다시 시도해주세요.`);
+          return;
+        }
+        const name = (rName.value || '').trim() || '자유시민';
+        const text = (rText.value || '').trim();
+        const loc = rLoc.value || '기타';
+        if (hasBlock(text) || hasBlock(name)) { alert('부적절한 단어가 포함되어 있어요.'); return; }
+        if (!myUid) { alert('로그인 중입니다. 잠시 후 다시 시도해주세요.'); return; }
+
+        rmSubmit.disabled = true;
+        rmSubmit.textContent = '업로드 중...';
+        try {
+          /* 1) Storage 업로드 */
+          const id = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+          const path = `reports/${id}.jpg`;
+          const fileRef = sRef(storage, path);
+          await uploadBytes(fileRef, pendingBlob, { contentType: 'image/jpeg' });
+          const photoUrl = await getDownloadURL(fileRef);
+
+          /* 2) RTDB 등록 */
+          await set(ref(db, `reports/${id}`), {
+            name: name.slice(0, 20),
+            text: text.slice(0, 100),
+            location: loc,
+            photoUrl,
+            photoPath: path,
+            ts: serverTimestamp(),
+            uid: myUid,
+            reports: 0
+          });
+
+          lastReportTime = now;
+          localStorage.setItem('chatName', name);
+          alert('✅ 제보 올라갔습니다! 응원 메시지가 도착할 거예요.');
+          closeReportModal();
+        } catch (e) {
+          console.error(e);
+          alert('업로드 실패. 잠시 후 다시 시도해주세요.\n' + (e.message || ''));
+        } finally {
+          rmSubmit.disabled = false;
+          rmSubmit.textContent = '제보 올리기';
+        }
+      });
+    }
+
+    /* === 응원/신고 상태 (localStorage) === */
+    function getCheeredMap() {
+      try { return JSON.parse(localStorage.getItem('cheered') || '{}'); }
+      catch { return {}; }
+    }
+    function saveCheeredMap(m) {
+      try { localStorage.setItem('cheered', JSON.stringify(m)); } catch { }
+    }
+    function hasCheered(rid, emoji) {
+      const m = getCheeredMap();
+      return !!m[`${rid}_${emoji}`];
+    }
+    function markCheered(rid, emoji) {
+      const m = getCheeredMap();
+      m[`${rid}_${emoji}`] = 1;
+      saveCheeredMap(m);
+    }
+
+    /* === 제보 카드 렌더링 === */
+    const CHEER_EMOJIS = [
+      { e: '🇰🇷', label: '자유' },
+      { e: '🙏', label: '감사' },
+      { e: '💪', label: '화이팅' },
+      { e: '❤️', label: '응원' }
+    ];
+
+    function fmtRelTime(ts) {
+      if (!ts) return '방금';
+      const diff = Date.now() - ts;
+      const min = Math.floor(diff / 60000);
+      if (min < 1) return '방금';
+      if (min < 60) return `${min}분 전`;
+      const hr = Math.floor(min / 60);
+      if (hr < 24) return `${hr}시간 전`;
+      const day = Math.floor(hr / 24);
+      return `${day}일 전`;
+    }
+
+    function renderReportCard(id, data) {
+      if (document.getElementById(`rp-${id}`)) return;
+      const isDev = (data.name || '') === DEV_NICK;
+      const displayName = isDev ? '개발자(본인)' : (data.name || '자유시민');
+      const devBadge = isDev ? '<span class="dev-badge-r">🛡️</span>' : '';
+      const reportsCount = data.reports || 0;
+      const hidden = reportsCount >= AUTO_HIDE_REPORTS;
+
+      const card = document.createElement('article');
+      card.className = 'report-card' + (hidden ? ' hidden' : '');
+      card.id = `rp-${id}`;
+
+      const cheersHtml = CHEER_EMOJIS.map(c => {
+        const n = (data.cheers && data.cheers[c.e]) || 0;
+        const cheered = hasCheered(id, c.e) ? ' cheered' : '';
+        return `<button class="cheer-btn${cheered}" data-emoji="${c.e}" data-rid="${id}">${c.e}<span class="cnum">${n}</span></button>`;
+      }).join('');
+
+      card.innerHTML = `
+        <div class="report-photo">
+          <span class="report-loc">📍 ${esc(data.location || '기타')}</span>
+          <button class="report-flag-btn" data-rid="${id}" title="신고">🚨 신고</button>
+          <img src="${esc(data.photoUrl || '')}" alt="현장 사진" loading="lazy" data-rid="${id}" />
+        </div>
+        <div class="report-body">
+          <div class="report-meta">
+            <span class="rname${isDev ? ' dev' : ''}">${devBadge}${esc(displayName)}</span>
+            <span>·</span>
+            <span class="rtime" data-ts="${data.ts || 0}">${fmtRelTime(data.ts)}</span>
+          </div>
+          ${data.text ? `<div class="report-text">${esc(data.text)}</div>` : ''}
+        </div>
+        <div class="report-cheers" data-rid="${id}">${cheersHtml}</div>
+        <div class="report-comments">
+          <div class="rc-list" id="rc-list-${id}"><div class="rc-empty">첫 응원 메시지를 남겨주세요</div></div>
+          <form class="rc-form" data-rid="${id}">
+            <input type="text" placeholder="응원 메시지 (100자)" maxlength="100" />
+            <button type="submit">전송</button>
+          </form>
+        </div>
+      `;
+      /* 최신 글이 위로 — prepend */
+      if (rEmpty && !rEmpty.hidden) { rEmpty.hidden = true; }
+      rGrid.insertBefore(card, rGrid.firstChild);
+      reportCount++;
+      if (rTotalCountEl) rTotalCountEl.textContent = reportCount.toString();
+
+      /* 댓글 구독 */
+      const cmtRef = query(ref(db, `reports/${id}/comments`), limitToLast(20));
+      onChildAdded(cmtRef, snap => {
+        const c = snap.val() || {};
+        const listEl = document.getElementById(`rc-list-${id}`);
+        if (!listEl) return;
+        const empty = listEl.querySelector('.rc-empty');
+        if (empty) empty.remove();
+        const cIsDev = (c.name || '') === DEV_NICK;
+        const cName = cIsDev ? '개발자(본인)' : (c.name || '익명');
+        const cBadge = cIsDev ? '<span class="dev-badge-r">🛡️</span>' : '';
+        const cItem = document.createElement('div');
+        cItem.className = 'rc-item';
+        cItem.innerHTML = `<span class="rc-name${cIsDev ? ' dev' : ''}">${cBadge}${esc(cName)}</span>${esc(c.text || '')}`;
+        listEl.appendChild(cItem);
+        listEl.scrollTop = listEl.scrollHeight;
+      });
+    }
+
+    /* 카드 업데이트 (응원수/신고수 변경 시) */
+    function updateReportCard(id, data) {
+      const card = document.getElementById(`rp-${id}`);
+      if (!card) return;
+      const reportsCount = data.reports || 0;
+      if (reportsCount >= AUTO_HIDE_REPORTS) {
+        card.classList.add('hidden');
+        return;
+      }
+      const cheerArea = card.querySelector('.report-cheers');
+      if (cheerArea) {
+        CHEER_EMOJIS.forEach(c => {
+          const btn = cheerArea.querySelector(`[data-emoji="${c.e}"] .cnum`);
+          if (btn) {
+            const n = (data.cheers && data.cheers[c.e]) || 0;
+            btn.textContent = n;
+          }
+        });
+      }
+    }
+
+    /* 제보 구독 */
+    const reportsRef = query(ref(db, 'reports'), limitToLast(REPORT_LIMIT));
+    onChildAdded(reportsRef, snap => {
+      const data = snap.val();
+      if (!data || !data.photoUrl) return;
+      renderReportCard(snap.key, data);
+      /* 새 제보 토스트 (첫 로드 끝난 뒤 + 본인 아님) */
+      if (!reportFirstLoad && data.uid !== myUid && !document.hidden) {
+        showToast(`📸 ${data.location || '현장'}`, `${data.name || '자유시민'}님이 사진을 올렸습니다`);
+      }
+    });
+    onChildChanged(reportsRef, snap => {
+      const data = snap.val();
+      if (!data) return;
+      updateReportCard(snap.key, data);
+    });
+
+    /* === 응원 버튼 (이벤트 위임) === */
+    rGrid.addEventListener('click', async e => {
+      const btn = e.target.closest('.cheer-btn');
+      if (!btn) return;
+      const rid = btn.dataset.rid;
+      const emoji = btn.dataset.emoji;
+      if (!rid || !emoji) return;
+      if (hasCheered(rid, emoji)) {
+        btn.style.animation = 'qcShake .3s';
+        setTimeout(() => { btn.style.animation = ''; }, 300);
+        return;
+      }
+      markCheered(rid, emoji);
+      btn.classList.add('cheered');
+      try {
+        await runTransaction(ref(db, `reports/${rid}/cheers/${emoji}`), cur => (cur || 0) + 1);
+      } catch (err) {
+        console.warn('응원 실패', err);
+      }
+    });
+
+    /* === 신고 버튼 === */
+    rGrid.addEventListener('click', async e => {
+      const btn = e.target.closest('.report-flag-btn');
+      if (!btn) return;
+      const rid = btn.dataset.rid;
+      if (!rid) return;
+      const reported = JSON.parse(localStorage.getItem('reported') || '{}');
+      if (reported[rid]) { alert('이미 신고하셨습니다.'); return; }
+      if (!confirm('이 사진을 부적절한 콘텐츠로 신고하시겠습니까?')) return;
+      reported[rid] = 1;
+      try { localStorage.setItem('reported', JSON.stringify(reported)); } catch { }
+      try {
+        await runTransaction(ref(db, `reports/${rid}/reports`), cur => (cur || 0) + 1);
+        alert('신고가 접수되었습니다. 누적되면 자동 숨김됩니다.');
+      } catch (err) {
+        console.warn('신고 실패', err);
+      }
+    });
+
+    /* === 댓글 작성 === */
+    rGrid.addEventListener('submit', async e => {
+      const form = e.target.closest('.rc-form');
+      if (!form) return;
+      e.preventDefault();
+      const rid = form.dataset.rid;
+      const input = form.querySelector('input');
+      const text = (input.value || '').trim();
+      if (!text) return;
+      if (hasBlock(text)) { alert('부적절한 단어가 포함되어 있어요.'); return; }
+      if (!myUid) { alert('잠시 후 다시 시도해주세요.'); return; }
+      const cname = (document.getElementById('cname')?.value || '').trim() || (rName.value || '').trim() || '익명';
+      const sendBtn = form.querySelector('button');
+      sendBtn.disabled = true;
+      try {
+        await push(ref(db, `reports/${rid}/comments`), {
+          name: cname.slice(0, 20),
+          text: text.slice(0, 100),
+          ts: serverTimestamp(),
+          uid: myUid
+        });
+        input.value = '';
+      } catch (err) {
+        console.error(err);
+        alert('댓글 전송 실패. 잠시 후 다시 시도해주세요.');
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+
+    /* === 라이트박스 (사진 확대) === */
+    rGrid.addEventListener('click', e => {
+      const img = e.target.closest('.report-photo img');
+      if (!img) return;
+      rLightboxImg.src = img.src;
+      rLightbox.hidden = false;
+    });
+    rLightbox.addEventListener('click', () => {
+      rLightbox.hidden = true;
+      rLightboxImg.src = '';
+    });
+
+    /* === ESC로 모달 닫기 (제보 + 라이트박스) === */
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if (!rModal.hidden) closeReportModal();
+      if (!rLightbox.hidden) { rLightbox.hidden = true; rLightboxImg.src = ''; }
+    });
+
+    /* === 시간 표시 주기 갱신 === */
+    setInterval(() => {
+      document.querySelectorAll('.rtime').forEach(el => {
+        const ts = parseInt(el.dataset.ts, 10);
+        if (ts) el.textContent = fmtRelTime(ts);
+      });
+    }, 60000);
   </script>
 </body>
 

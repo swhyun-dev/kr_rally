@@ -2328,6 +2328,84 @@
       margin-top: 6px;
       line-height: 1.4
     }
+    .la-auth-state {
+      font-size: 11px;
+      color: var(--sub);
+      margin-bottom: 6px;
+      padding: 6px 8px;
+      background: rgba(255, 255, 255, .03);
+      border-radius: 6px;
+      text-align: center;
+      word-break: break-all
+    }
+    .la-auth-state.on { color: var(--gold); font-weight: 700 }
+    .la-google-btn {
+      width: 100%;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: #444;
+      padding: 9px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all .15s
+    }
+    .la-google-btn:hover:not(:disabled) {
+      background: #f1f3f4
+    }
+    .la-google-btn:disabled { opacity: .5; cursor: not-allowed }
+    .la-logout-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--sub);
+      color: var(--sub);
+      padding: 7px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      margin-bottom: 6px
+    }
+    .la-uid-box {
+      background: rgba(255, 213, 74, .06);
+      border: 1px dashed var(--gold);
+      border-radius: 8px;
+      padding: 8px;
+      margin-top: 8px
+    }
+    .la-uid-label {
+      font-size: 10px;
+      color: var(--sub);
+      margin-bottom: 4px
+    }
+    .la-uid-val {
+      font-family: monospace;
+      font-size: 11px;
+      color: var(--gold);
+      word-break: break-all;
+      background: rgba(0, 0, 0, .2);
+      padding: 6px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      display: block
+    }
+    .la-copy-btn {
+      width: 100%;
+      background: rgba(255, 213, 74, .15);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 6px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer
+    }
+    .la-copy-btn:hover { background: rgba(255, 213, 74, .25) }
   </style>
 </head>
 
@@ -2810,7 +2888,7 @@
   <!-- Firebase 실시간 채팅 -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, signInWithPopup, signOut, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
     import { getDatabase, ref, push, set, get, remove, update, onDisconnect, query, limitToLast, onChildAdded, onChildChanged, runTransaction, serverTimestamp, onValue, orderByChild } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
@@ -3334,6 +3412,21 @@
       adminBox.innerHTML = `
         <h4>🛡️ 운영자 패널</h4>
 
+        <div class="la-auth la-section">
+          <div class="la-h">🔐 Google 로그인</div>
+          <div class="la-auth-state" id="laAuthState">로그인 상태 확인 중...</div>
+          <button type="button" class="la-google-btn" id="laGoogleLogin">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09 0-.72.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Google로 로그인
+          </button>
+          <button type="button" class="la-logout-btn" id="laGoogleLogout" hidden>로그아웃 (익명으로 돌아감)</button>
+          <div class="la-uid-box" id="laUidBox" hidden>
+            <div class="la-uid-label">📌 내 UID (운영자 권한 등록용)</div>
+            <code class="la-uid-val" id="laUid"></code>
+            <button type="button" class="la-copy-btn" id="laCopyUid">📋 UID 복사</button>
+          </div>
+        </div>
+
         <div class="la-api la-section">
           <div class="la-h">🤖 자동 감지 (YouTube API)</div>
           <input type="password" id="laApiKey" placeholder="API 키 입력 (Google Cloud)" autocomplete="off" />
@@ -3361,6 +3454,76 @@
         <button class="la-close" type="button">닫기</button>
       `;
       document.body.appendChild(adminBox);
+
+      /* === Google 로그인 처리 === */
+      const authStateEl = adminBox.querySelector('#laAuthState');
+      const loginBtn = adminBox.querySelector('#laGoogleLogin');
+      const logoutBtn = adminBox.querySelector('#laGoogleLogout');
+      const uidBox = adminBox.querySelector('#laUidBox');
+      const uidValEl = adminBox.querySelector('#laUid');
+      const copyUidBtn = adminBox.querySelector('#laCopyUid');
+
+      function refreshAuthState() {
+        const u = auth.currentUser;
+        if (u && !u.isAnonymous) {
+          const name = u.displayName || u.email || 'Google 사용자';
+          authStateEl.innerHTML = `🟢 로그인됨<br><b>${esc(name)}</b>`;
+          authStateEl.classList.add('on');
+          loginBtn.hidden = true;
+          logoutBtn.hidden = false;
+          uidValEl.textContent = u.uid;
+          uidBox.hidden = false;
+        } else {
+          authStateEl.textContent = '⚫ 익명 상태 · 로그인이 필요합니다';
+          authStateEl.classList.remove('on');
+          loginBtn.hidden = false;
+          logoutBtn.hidden = true;
+          uidBox.hidden = true;
+        }
+      }
+      refreshAuthState();
+      onAuthStateChanged(auth, refreshAuthState);
+
+      loginBtn.addEventListener('click', async () => {
+        loginBtn.disabled = true;
+        try {
+          const provider = new GoogleAuthProvider();
+          await signInWithPopup(auth, provider);
+        } catch (e) {
+          if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+            alert('로그인 실패: ' + (e.message || e.code));
+          }
+        } finally {
+          loginBtn.disabled = false;
+        }
+      });
+
+      logoutBtn.addEventListener('click', async () => {
+        if (!confirm('로그아웃 하시면 익명 사용자로 돌아갑니다. 계속할까요?')) return;
+        try {
+          await signOut(auth);
+          await signInAnonymously(auth);
+        } catch (e) {
+          alert('로그아웃 실패: ' + e.message);
+        }
+      });
+
+      copyUidBtn.addEventListener('click', async () => {
+        const uid = uidValEl.textContent;
+        try {
+          await navigator.clipboard.writeText(uid);
+          copyUidBtn.textContent = '✅ 복사됨!';
+          setTimeout(() => { copyUidBtn.textContent = '📋 UID 복사'; }, 2000);
+        } catch {
+          /* Fallback: select text */
+          const range = document.createRange();
+          range.selectNode(uidValEl);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+          copyUidBtn.textContent = '✅ 선택됨 (Ctrl+C)';
+          setTimeout(() => { copyUidBtn.textContent = '📋 UID 복사'; }, 2000);
+        }
+      });
 
       const apiKeyInput = adminBox.querySelector('#laApiKey');
       const apiStatusEl = adminBox.querySelector('#laApiStatus');

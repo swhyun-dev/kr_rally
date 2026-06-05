@@ -2491,7 +2491,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getDatabase, ref, push, set, remove, update, onDisconnect, query, limitToLast, onChildAdded, onChildChanged, runTransaction, serverTimestamp, onValue, orderByChild } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
+    import { getDatabase, ref, push, set, get, remove, update, onDisconnect, query, limitToLast, onChildAdded, onChildChanged, runTransaction, serverTimestamp, onValue, orderByChild } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js";
     import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
 
@@ -2518,8 +2518,36 @@
       if (u) {
         myUid = u.uid;
         setupPresence(u.uid);
+        syncStatsWithRealData();
       }
     });
+
+    /* === stats 노드를 실제 데이터로 동기화 (세션당 1회) === */
+    /* ?reseed=1 URL 파라미터로 강제 재동기화 가능 */
+    async function syncStatsWithRealData() {
+      const forceReseed = new URLSearchParams(location.search).get('reseed') === '1';
+      if (!forceReseed && sessionStorage.getItem('statsSynced')) return;
+      try {
+        const [msgsSnap, repsSnap] = await Promise.all([
+          get(ref(db, 'messages')),
+          get(ref(db, 'reports'))
+        ]);
+        const realMsgs = msgsSnap.size || 0;
+        const realReps = repsSnap.size || 0;
+        console.log('실제 데이터 — 메시지:', realMsgs, '제보:', realReps);
+        /* 강제 시드면 set, 아니면 Math.max 트랜잭션 (서로 덮어쓰지 않게) */
+        if (forceReseed) {
+          await set(ref(db, 'stats/totalMessages'), realMsgs);
+          await set(ref(db, 'stats/totalReports'), realReps);
+        } else {
+          await runTransaction(ref(db, 'stats/totalMessages'), cur => Math.max(cur || 0, realMsgs));
+          await runTransaction(ref(db, 'stats/totalReports'), cur => Math.max(cur || 0, realReps));
+        }
+        sessionStorage.setItem('statsSynced', '1');
+      } catch (e) {
+        console.warn('stats 동기화 실패', e);
+      }
+    }
 
     /* 실시간 접속자 추적 (Firebase Presence) */
     function setupPresence(uid) {

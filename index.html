@@ -948,6 +948,15 @@
       line-height: 1.55
     }
 
+    /* 결집 정보 업데이트 날짜 */
+    .rally .rdate {
+      font-size: 11.5px;
+      color: var(--sub);
+      margin: -4px 0 14px;
+      letter-spacing: .3px
+    }
+    .rally .rdate b { color: var(--gold); font-weight: 800 }
+
     /* 변동 안내 메모 */
     .update-note {
       margin-top: 16px;
@@ -1038,6 +1047,13 @@
       font-size: 28px;
       margin-bottom: 6px;
       line-height: 1
+    }
+    .prep-item .pic-img {
+      display: block;
+      width: 36px;
+      height: 36px;
+      margin: 0 auto 6px;
+      filter: drop-shadow(0 2px 6px rgba(255, 32, 48, .25))
     }
     .prep-item .ptx {
       display: block;
@@ -1488,14 +1504,14 @@
         바로 <span class="em">지금</span>,<br />모일 때입니다
       </h1>
       <p class="lead reveal" style="--delay:.18s">
-        혼자서는 한 명입니다. 모이면 만 명이 됩니다.<br /><b>자유민주시민, 거리로 나와 주세요.</b>
+        혼자서는 한 명입니다. 모이면 만 명이 됩니다.<br /><b>지금, 거리로 나와 주세요.</b>
       </p>
     </section>
 
     <!-- 메인 강조 메시지 -->
     <div class="megabox reveal" style="--delay:.1s">
       <img class="flag-bg" src="flag.svg" alt="" aria-hidden="true" />
-      <span class="label">🔥 자유민주시민에게</span>
+      <span class="label">🔥 우리에게 필요한 건</span>
       <h2>침묵하지 마세요<br />지금이 바로 그 때입니다</h2>
       <div class="sub">한 사람의 발걸음이 역사를 바꿉니다</div>
     </div>
@@ -1509,7 +1525,8 @@
 
       <div class="rally reveal" style="--delay:.05s">
         <span class="rtag">🔄 최신 업데이트</span>
-        <h3>자유민주시민, 지금 모입니다</h3>
+        <div class="rdate">🕒 마지막 업데이트: <b>2026.06.05 (목) 새벽</b></div>
+        <h3>지금 이 시각, 모이고 있습니다</h3>
 
         <div class="row">
           <div class="ic">⏰</div>
@@ -1546,7 +1563,7 @@
         <div class="prep-grid">
           <div class="prep-item"><span class="pic">🔋</span><span class="ptx">보조배터리</span></div>
           <div class="prep-item"><span class="pic">🔥</span><span class="ptx">핫팩</span></div>
-          <div class="prep-item"><span class="pic">🇰🇷</span><span class="ptx">미니 태극기</span></div>
+          <div class="prep-item"><img class="pic-img" src="flag.svg" alt="태극기" /><span class="ptx">미니 태극기</span></div>
         </div>
       </div>
     </section>
@@ -1579,7 +1596,7 @@
       </div>
 
       <div class="yt-channels reveal" style="--delay:.1s">
-        <div class="yt-title">📺 다른 보수 채널 바로가기</div>
+        <div class="yt-title">📺 보수 유튜브 채널 바로가기</div>
         <div class="yt-grid">
           <a class="yt-btn" href="https://www.youtube.com/@Freeuniv0116" target="_blank" rel="noopener">
             <span class="yt-icon">🎓</span>
@@ -1640,7 +1657,7 @@
         <div class="about-block">
           <div class="about-h">📌 왜 이 사이트를 만들었나</div>
           <div class="about-p">
-            흩어져 있던 <b>자유민주시민의 결집 정보와 현장</b>을 한 곳에 모으기 위해 <b>한 시민</b>이 만들었습니다.
+            흩어져 있던 <b>결집 정보와 현장</b>을 한 곳에 모으기 위해 <b>한 시민</b>이 만들었습니다.
             거리에 나가야 한다는 마음은 있지만 어디로·무엇을 챙겨가야 할지 모르는 이웃들을 위해.
           </div>
         </div>
@@ -1648,7 +1665,7 @@
           <div class="about-h">🤝 왜 우리가 모여야 하나</div>
           <div class="about-p">
             혼자서는 한 명이지만, <b>모이면 만 명</b>이 됩니다.
-            침묵은 동의입니다. 거리는 자유민주시민의 가장 강력한 의사 표현입니다.
+            침묵은 동의입니다. 거리는 우리가 가진 가장 강력한 의사 표현입니다.
             우리가 직접 나서지 않으면, 누구도 대신 나서주지 않습니다.
           </div>
         </div>
@@ -1711,7 +1728,7 @@
     <div class="wbk" onclick="closeWelcome()"></div>
     <div class="wbox">
       <button class="wclose" onclick="closeWelcome()" aria-label="닫기">✕</button>
-      <span class="wtag">📢 자유민주시민에게</span>
+      <span class="wtag">📢 함께 알려주세요</span>
       <div class="wtitle">바로 <span class="em">지금</span> 입니다</div>
       <div class="wdesc">
         <b>한 명이라도 더</b> 거리로 나와야 합니다.<br />

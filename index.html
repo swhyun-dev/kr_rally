@@ -3327,8 +3327,8 @@
     /* 페이지 로드 시 키가 있으면 자동 시작 */
     setTimeout(() => { if (myUid) ytStartAuto(); else setTimeout(ytStartAuto, 2000); }, 1500);
 
-    /* === 운영자 패널 — ?admin=resetkr0603 으로 활성화 === */
-    if (new URLSearchParams(location.search).get('admin') === 'resetkr0603') {
+    /* === 운영자 패널 (임시 토큰 기반 · 곧 Firebase Auth로 교체 예정) === */
+    if (new URLSearchParams(location.search).get('op') === 'xK9mP3qN7wLv5J8R') {
       const adminBox = document.createElement('div');
       adminBox.className = 'live-admin';
       adminBox.innerHTML = `

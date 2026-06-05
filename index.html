@@ -1770,7 +1770,7 @@
     <!-- 실시간 방송 (자동 추적) -->
     <section class="section">
       <h2 class="reveal">📺 <span class="em">실시간</span> 방송</h2>
-      <p class="lead reveal" style="--delay:.06s">선정된 채널의 <b style="color:var(--gold)">현재 라이브를 자동 추적</b>합니다. 라이브 종료 후 새 라이브 시작되면 자동 전환.</p>
+      <p class="lead reveal" style="--delay:.06s">🔴 <b style="color:var(--gold)">라이브 자동 업데이트 중</b> · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
 
       <div class="livetv reveal" style="--delay:.04s">
         <div class="lvlabel">📡 황교안TV <span class="lvsub">@Hwang_Kyo-ahn_TV</span></div>
@@ -2085,6 +2085,19 @@
         if (onlineEl) onlineEl.textContent = '🟢 LIVE';
       });
     }
+
+    /* 라이브 마지막 확인 시각 표시 (30초마다 갱신) */
+    function updateLiveTime() {
+      const el = document.getElementById('liveCheckTime');
+      if (!el) return;
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+      el.textContent = `${hh}:${mm}:${ss}`;
+    }
+    updateLiveTime();
+    setInterval(updateLiveTime, 30000);
 
     /* 누적 방문 카운트 표시 (사회증거) */
     function loadVisits() {

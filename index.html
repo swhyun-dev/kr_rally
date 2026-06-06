@@ -3184,8 +3184,20 @@
     }
 
     let firstLoad = true;
+    let firstLoadDebounce = null;
+    let userScrolledDuringLoad = false;
     let count = 0;
-    setTimeout(() => { firstLoad = false; }, 1500);
+    function endInitialLoad() {
+      if (!firstLoad) return;
+      firstLoad = false;
+      /* 사용자가 스크롤 안 했으면 최종 한 번 더 최하단 강제 */
+      if (!userScrolledDuringLoad) msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+    /* 안전망: 최대 6초 후 강제 종료 */
+    setTimeout(endInitialLoad, 6000);
+    /* 사용자가 휠/터치로 직접 스크롤하면 자동 스크롤 중단 */
+    msgsEl.addEventListener('wheel', () => { userScrolledDuringLoad = true; }, { passive: true });
+    msgsEl.addEventListener('touchmove', () => { userScrolledDuringLoad = true; }, { passive: true });
 
     const msgsRef = query(ref(db, 'messages'), limitToLast(100));
     let connected = false;
@@ -3216,8 +3228,13 @@
         if (!chatVisible) showToast(data.name || '익명', data.text || '');
       }
 
+      /* 초기 로드 중: 메시지 들어올 때마다 1.2초 디바운스 (마지막 메시지 1.2초 뒤에 종료) */
+      if (firstLoad) {
+        clearTimeout(firstLoadDebounce);
+        firstLoadDebounce = setTimeout(endInitialLoad, 1200);
+      }
       const nearBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 180;
-      if (firstLoad || nearBottom) msgsEl.scrollTop = msgsEl.scrollHeight;
+      if ((firstLoad && !userScrolledDuringLoad) || nearBottom) msgsEl.scrollTop = msgsEl.scrollHeight;
     }, err => {
       console.error('채팅 불러오기 실패', err);
       const loading = msgsEl.querySelector('.cloading');

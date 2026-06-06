@@ -3655,13 +3655,25 @@
       refreshAuthState();
       onAuthStateChanged(auth, refreshAuthState);
 
+      /* 앱 내장 브라우저 (카카오톡/인스타 등) 감지 */
+      function isInAppBrowser() {
+        const ua = navigator.userAgent || '';
+        return /KAKAOTALK|FBAN|FBAV|FB_IAB|Instagram|Line\/|NAVER\(inapp|DaumApps|everytimeApp|wv\)/i.test(ua);
+      }
+
       loginBtn.addEventListener('click', async () => {
+        if (isInAppBrowser()) {
+          alert('⚠️ 카카오톡·인스타그램·라인 등 앱 내장 브라우저에서는 Google 로그인이 차단됩니다.\n\n해결: 우측 상단 ⋮ 메뉴 → "다른 브라우저로 열기" 또는 "Chrome으로 열기" 선택 후 다시 시도해주세요.\n\n또는 Chrome/Safari를 직접 열고 resetkr0603.com 으로 접속하세요.');
+          return;
+        }
         loginBtn.disabled = true;
         try {
           const provider = new GoogleAuthProvider();
           await signInWithPopup(auth, provider);
         } catch (e) {
-          if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+          if (e.code === 'auth/operation-not-supported-in-this-environment' || (e.message || '').includes('disallowed_useragent')) {
+            alert('⚠️ 현재 브라우저에서는 Google 로그인이 차단됩니다.\n\n외부 브라우저(Chrome, Safari)에서 resetkr0603.com 으로 접속해주세요.');
+          } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
             alert('로그인 실패: ' + (e.message || e.code));
           }
         } finally {

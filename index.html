@@ -2690,6 +2690,27 @@
         <div class="lvbox"></div>
       </div>
 
+      <div class="livetv reveal lv-toggle" style="--delay:.19s" id="live-penn1" data-key="penn1" data-name="펜앤마이크TV">
+        <div class="lvlabel">📡 펜앤마이크TV <span class="lvsub">@penn1tv</span> <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
+        <div class="lvbox"></div>
+      </div>
+
+      <div class="livetv reveal lv-toggle" style="--delay:.22s" id="live-sisafocus" data-key="sisafocus" data-name="시사포커스TV">
+        <div class="lvlabel">📡 시사포커스TV <span class="lvsub">@sisafocustv</span> <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
+        <div class="lvbox"></div>
+      </div>
+
+      <div class="livetv reveal lv-toggle" style="--delay:.25s" id="live-manggito" data-key="manggito" data-cid="UC6jYTOc0CbF-rqWxT2q3PBQ" data-name="망기토TV">
+        <div class="lvlabel">📡 망기토TV <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
+        <div class="lvbox"></div>
+      </div>
+
       <div class="lv-empty" id="lvEmpty" hidden>
         <div class="lv-empty-icon">📺</div>
         <div class="lv-empty-title">현재 진행 중인 라이브가 없습니다</div>
@@ -3329,12 +3350,16 @@
     }
 
     /* === 라이브 채널 자동 표시/숨김 === */
+    /* cid (UC...) 또는 handle (@ 없이) 둘 중 하나 필수 · 둘 다 있으면 cid 우선 */
     const LIVE_CHANNELS = [
       { key: 'hwang', cid: 'UCnacnZiUscX6jrVKu78Notg', name: '황교안TV' },
       { key: 'hangil', cid: 'UC_iT-dQV96rPviS4G4p5b9A', name: '한길뉴스' },
       { key: 'freeuniv', cid: 'UCCnkoO8v5K8B2_AUjbtKlYQ', name: '자유대학' },
       { key: 'elonmusk', cid: 'UCWS0tefWL5UpQsZI2yc8ASg', name: '일론머스크' },
-      { key: 'knl', cid: 'UC2vZ-y5LAIaqJt5aIp9o-Tg', name: 'Korea Narrative Live' }
+      { key: 'knl', cid: 'UC2vZ-y5LAIaqJt5aIp9o-Tg', name: 'Korea Narrative Live' },
+      { key: 'penn1', handle: 'penn1tv', name: '펜앤마이크TV' },
+      { key: 'sisafocus', handle: 'sisafocustv', name: '시사포커스TV' },
+      { key: 'manggito', cid: 'UC6jYTOc0CbF-rqWxT2q3PBQ', name: '망기토TV' }
     ];
     function buildLiveIframe(cid, name) {
       return `<iframe src="https://www.youtube.com/embed/live_stream?channel=${cid}&autoplay=1&mute=1&playsinline=1"
@@ -3447,16 +3472,37 @@
     let ytTimer = null;
 
     async function ytFetchChannelPlaylists(apiKey) {
-      const ids = LIVE_CHANNELS.map(c => c.cid).join(',');
-      const url = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${ids}&key=${apiKey}`;
-      const r = await fetch(url);
-      if (!r.ok) throw new Error(`channels.list ${r.status}: ${await r.text()}`);
-      const data = await r.json();
       const map = {};
-      data.items.forEach(item => {
-        const ch = LIVE_CHANNELS.find(c => c.cid === item.id);
-        if (ch) map[ch.key] = item.contentDetails.relatedPlaylists.uploads;
-      });
+      /* 1) cid 있는 채널은 배치 호출 (1 unit) */
+      const withCid = LIVE_CHANNELS.filter(c => c.cid);
+      if (withCid.length > 0) {
+        const ids = withCid.map(c => c.cid).join(',');
+        const url = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${ids}&key=${apiKey}`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`channels.list ${r.status}: ${await r.text()}`);
+        const data = await r.json();
+        (data.items || []).forEach(item => {
+          const ch = LIVE_CHANNELS.find(c => c.cid === item.id);
+          if (ch) map[ch.key] = item.contentDetails.relatedPlaylists.uploads;
+        });
+      }
+      /* 2) handle만 있는 채널은 forHandle 로 개별 해결 (각 1 unit) + cid 캐시 */
+      const withHandle = LIVE_CHANNELS.filter(c => !c.cid && c.handle);
+      for (const ch of withHandle) {
+        try {
+          const url = `https://www.googleapis.com/youtube/v3/channels?part=id,contentDetails&forHandle=${encodeURIComponent(ch.handle)}&key=${apiKey}`;
+          const r = await fetch(url);
+          if (!r.ok) { console.warn(`forHandle 실패(${ch.handle}):`, r.status); continue; }
+          const data = await r.json();
+          const item = (data.items || [])[0];
+          if (item) {
+            map[ch.key] = item.contentDetails.relatedPlaylists.uploads;
+            ch.cid = item.id; /* 세션 내 캐시 */
+          }
+        } catch (e) {
+          console.warn(`handle 해결 실패(${ch.handle})`, e);
+        }
+      }
       return map;
     }
 

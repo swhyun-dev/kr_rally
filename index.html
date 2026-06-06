@@ -2168,6 +2168,42 @@
       color: var(--text);
       box-shadow: 0 4px 12px rgba(255, 32, 48, .1)
     }
+    .lv-judgment {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      background: linear-gradient(135deg, rgba(255, 213, 74, .08), rgba(255, 32, 48, .04));
+      border: 1px solid rgba(255, 213, 74, .35);
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(255, 213, 74, .08)
+    }
+    .lj-icon {
+      font-size: 30px;
+      flex-shrink: 0;
+      line-height: 1.1
+    }
+    .lj-body { flex: 1 }
+    .lj-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: var(--gold);
+      margin-bottom: 6px
+    }
+    .lj-text {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6
+    }
+    .lj-text b { color: var(--gold) }
+    .lj-sub {
+      display: block;
+      color: var(--sub);
+      font-size: 12px;
+      margin-top: 8px;
+      line-height: 1.5
+    }
     .lv-total b {
       color: var(--gold);
       font-size: 18px;
@@ -2735,7 +2771,19 @@
     <!-- 실시간 방송 (라이브 진행 중인 채널만 표시) -->
     <section class="section" id="liveSection">
       <h2 class="reveal">📺 <span class="em">실시간</span> 방송</h2>
-      <p class="lead reveal" style="--delay:.06s">🔴 <b style="color:var(--gold)">라이브 자동 감지 중</b> · 라이브 중인 채널만 표시됩니다 · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
+      <p class="lead reveal" style="--delay:.06s">🔴 <b style="color:var(--gold)">여러 채널을 동시에 보고 직접 판단하세요.</b> 한 채널 말만 믿고 섣불리 움직이지 마세요. · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
+
+      <div class="lv-judgment reveal" style="--delay:.05s">
+        <div class="lj-icon">🧭</div>
+        <div class="lj-body">
+          <div class="lj-title">직접 판단하세요</div>
+          <div class="lj-text">
+            "<b>어디로 가라</b>"는 한 마디에 휘둘리지 마시고,
+            여러 채널을 <b>동시에 보면서</b> 본인이 직접 상황을 파악하세요.
+            <span class="lj-sub">분탕질·갈라치기·잘못된 정보에 휘둘리지 않게 — 시민 개개인이 정보 주권을 가져야 합니다.</span>
+          </div>
+        </div>
+      </div>
 
       <div class="lv-total reveal" id="liveTotalViewers" hidden></div>
 
@@ -3573,6 +3621,9 @@
       const emptyEl = document.getElementById('lvEmpty');
       if (emptyEl) emptyEl.hidden = visibleCount > 0;
     }
+    /* === 라이브 상세 정보 상태 (renderLiveStatus 호출 전에 선언 필수 — TDZ 방지) === */
+    let currentLiveInfo = {};
+
     /* 초기 로드 시 모두 표시 (Firebase 노드 없거나 구독 전이어도) */
     renderLiveStatus({});
     onValue(ref(db, 'liveStatus'), snap => {
@@ -3585,7 +3636,6 @@
     });
 
     /* === 라이브 상세 정보 (제목·시청자·시작 시간) === */
-    let currentLiveInfo = {};
     function fmtLiveStartTime(startMs) {
       if (!startMs) return '';
       const elapsed = Date.now() - startMs;

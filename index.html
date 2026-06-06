@@ -3588,34 +3588,43 @@
         const isLive = status[ch.key] !== false;
         const box = el.querySelector('.lvbox');
         const thumb = el.querySelector('.lvthumb');
-        if (isLive) {
+        if (!isLive) {
+          el.hidden = true;
+          if (box) { box.hidden = true; box.innerHTML = ''; box.removeAttribute('data-src'); }
+          if (thumb) thumb.hidden = true;
+          return;
+        }
+        if (ch.embed === false) {
+          /* 임베드 차단 채널 → 썸네일 표시 (handle URL 폴백 가능) */
+          if (box) { box.hidden = true; box.innerHTML = ''; box.removeAttribute('data-src'); }
+          if (thumb) thumb.hidden = false;
           el.hidden = false;
           visibleCount++;
-          if (ch.embed === false) {
-            /* 임베드 차단 채널 → 썸네일 표시 */
-            if (box) { box.hidden = true; box.innerHTML = ''; }
-            if (thumb) thumb.hidden = false;
-          } else {
-            /* 임베드 가능 채널 → iframe (동시 중계) */
-            if (thumb) thumb.hidden = true;
-            if (box) {
-              box.hidden = false;
-              const info = (currentLiveInfo || {})[ch.key];
-              const desiredSrc = info && info.videoId
-                ? `https://www.youtube.com/embed/${info.videoId}?autoplay=1&mute=1&playsinline=1`
-                : ch.cid ? `https://www.youtube.com/embed/live_stream?channel=${ch.cid}&autoplay=1&mute=1&playsinline=1` : null;
-              if (desiredSrc) {
-                const currentIframe = box.querySelector('iframe');
-                if (!currentIframe || currentIframe.src !== desiredSrc) {
-                  box.innerHTML = buildIframeHtml(desiredSrc, ch.name);
-                }
-              }
-            }
-          }
-        } else {
+          return;
+        }
+        /* 임베드 가능 채널 → iframe */
+        const info = (currentLiveInfo || {})[ch.key];
+        const desiredSrc = info && info.videoId
+          ? `https://www.youtube.com/embed/${info.videoId}?autoplay=1&mute=1&playsinline=1`
+          : ch.cid ? `https://www.youtube.com/embed/live_stream?channel=${ch.cid}&autoplay=1&mute=1&playsinline=1` : null;
+        if (!desiredSrc) {
+          /* handle만 있고 아직 cid 미해결 → 일시적으로 숨김 (운영자 새로고침 후 해결됨) */
           el.hidden = true;
-          if (box) { box.hidden = true; box.innerHTML = ''; }
+          if (box) { box.hidden = true; box.innerHTML = ''; box.removeAttribute('data-src'); }
           if (thumb) thumb.hidden = true;
+          return;
+        }
+        el.hidden = false;
+        visibleCount++;
+        if (thumb) thumb.hidden = true;
+        if (box) {
+          box.hidden = false;
+          /* data-src 로 비교 — iframe.src 정규화 차이로 인한 무한 재구성 방지 */
+          const currentSrc = box.getAttribute('data-src');
+          if (currentSrc !== desiredSrc) {
+            box.setAttribute('data-src', desiredSrc);
+            box.innerHTML = buildIframeHtml(desiredSrc, ch.name);
+          }
         }
       });
       const emptyEl = document.getElementById('lvEmpty');

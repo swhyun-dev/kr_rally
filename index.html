@@ -2156,6 +2156,8 @@
     }
 
     /* === 라이브 채널 자동 표시 === */
+    /* hidden 속성이 display:block 으로 인한 우선순위 문제로 무시되는 것 방지 */
+    [hidden] { display: none !important }
     .lv-total {
       background: linear-gradient(135deg, rgba(255, 32, 48, .08), rgba(255, 213, 74, .08));
       border: 1px solid rgba(255, 213, 74, .4);

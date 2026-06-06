@@ -2205,6 +2205,27 @@
       color: var(--accent);
       font-weight: 800
     }
+    .lvfallback {
+      padding: 8px 14px;
+      text-align: right;
+      font-size: 11px;
+      color: var(--sub);
+      background: rgba(255, 255, 255, .02);
+      border-top: 1px solid var(--line);
+      margin-top: -4px;
+      border-radius: 0 0 10px 10px
+    }
+    .lvfallback a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px
+    }
+    .lvfallback a:hover {
+      text-decoration: underline
+    }
     .lvon {
       display: inline-block;
       background: var(--accent);
@@ -2660,6 +2681,7 @@
         <div class="lvtitle" hidden></div>
         <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
+        <div class="lvfallback"><a class="lvfblink" href="#" target="_blank" rel="noopener">📺 영상이 안 보이면 YouTube에서 직접 보기 →</a></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.07s" id="live-hangil" data-key="hangil" data-cid="UC_iT-dQV96rPviS4G4p5b9A" data-name="한길뉴스">
@@ -2667,6 +2689,7 @@
         <div class="lvtitle" hidden></div>
         <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
+        <div class="lvfallback"><a class="lvfblink" href="#" target="_blank" rel="noopener">📺 영상이 안 보이면 YouTube에서 직접 보기 →</a></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.1s" id="live-freeuniv" data-key="freeuniv" data-cid="UCCnkoO8v5K8B2_AUjbtKlYQ" data-name="자유대학">
@@ -2674,6 +2697,7 @@
         <div class="lvtitle" hidden></div>
         <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
+        <div class="lvfallback"><a class="lvfblink" href="#" target="_blank" rel="noopener">📺 영상이 안 보이면 YouTube에서 직접 보기 →</a></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.13s" id="live-elonmusk" data-key="elonmusk" data-cid="UCWS0tefWL5UpQsZI2yc8ASg" data-name="일론머스크">
@@ -2681,6 +2705,7 @@
         <div class="lvtitle" hidden></div>
         <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
+        <div class="lvfallback"><a class="lvfblink" href="#" target="_blank" rel="noopener">📺 영상이 안 보이면 YouTube에서 직접 보기 →</a></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.16s" id="live-knl" data-key="knl" data-cid="UC2vZ-y5LAIaqJt5aIp9o-Tg" data-name="Korea Narrative Live">
@@ -2688,6 +2713,7 @@
         <div class="lvtitle" hidden></div>
         <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
+        <div class="lvfallback"><a class="lvfblink" href="#" target="_blank" rel="noopener">📺 영상이 안 보이면 YouTube에서 직접 보기 →</a></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.19s" id="live-penn1" data-key="penn1" data-name="펜앤마이크TV">
@@ -2695,6 +2721,7 @@
         <div class="lvtitle" hidden></div>
         <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
+        <div class="lvfallback"><a class="lvfblink" href="#" target="_blank" rel="noopener">📺 영상이 안 보이면 YouTube에서 직접 보기 →</a></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.22s" id="live-sisafocus" data-key="sisafocus" data-name="시사포커스TV">
@@ -2702,6 +2729,7 @@
         <div class="lvtitle" hidden></div>
         <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
+        <div class="lvfallback"><a class="lvfblink" href="#" target="_blank" rel="noopener">📺 영상이 안 보이면 YouTube에서 직접 보기 →</a></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.25s" id="live-manggito" data-key="manggito" data-cid="UC6jYTOc0CbF-rqWxT2q3PBQ" data-name="망기토TV">
@@ -2709,6 +2737,7 @@
         <div class="lvtitle" hidden></div>
         <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
+        <div class="lvfallback"><a class="lvfblink" href="#" target="_blank" rel="noopener">📺 영상이 안 보이면 YouTube에서 직접 보기 →</a></div>
       </div>
 
       <div class="lv-empty" id="lvEmpty" hidden>
@@ -3361,7 +3390,13 @@
       { key: 'sisafocus', handle: 'sisafocustv', name: '시사포커스TV' },
       { key: 'manggito', cid: 'UC6jYTOc0CbF-rqWxT2q3PBQ', name: '망기토TV' }
     ];
-    function buildLiveIframe(cid, name) {
+    function buildLiveIframeFromVideoId(videoId, name) {
+      return `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&playsinline=1"
+        title="${name} 실시간 방송"
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
+    }
+    function buildLiveIframeFromChannel(cid, name) {
       return `<iframe src="https://www.youtube.com/embed/live_stream?channel=${cid}&autoplay=1&mute=1&playsinline=1"
         title="${name} 실시간 방송"
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -3377,8 +3412,19 @@
         const box = el.querySelector('.lvbox');
         if (isLive) {
           el.hidden = false;
-          if (box && !box.querySelector('iframe')) {
-            box.innerHTML = buildLiveIframe(ch.cid, ch.name);
+          /* videoId 있으면 직접 비디오 임베드 (더 안정적), 없으면 채널 라이브 URL */
+          const info = (currentLiveInfo || {})[ch.key];
+          const desiredSrc = info && info.videoId
+            ? `https://www.youtube.com/embed/${info.videoId}?autoplay=1&mute=1&playsinline=1`
+            : ch.cid ? `https://www.youtube.com/embed/live_stream?channel=${ch.cid}&autoplay=1&mute=1&playsinline=1` : null;
+          if (!desiredSrc) { visibleCount++; return; }
+          const currentIframe = box && box.querySelector('iframe');
+          if (!currentIframe || currentIframe.src !== desiredSrc) {
+            if (box) {
+              box.innerHTML = info && info.videoId
+                ? buildLiveIframeFromVideoId(info.videoId, ch.name)
+                : buildLiveIframeFromChannel(ch.cid, ch.name);
+            }
           }
           visibleCount++;
         } else {
@@ -3392,7 +3438,9 @@
     /* 초기 로드 시 모두 표시 (Firebase 노드 없거나 구독 전이어도) */
     renderLiveStatus({});
     onValue(ref(db, 'liveStatus'), snap => {
-      renderLiveStatus(snap.val() || {});
+      const v = snap.val() || {};
+      window.__lastLiveStatus = v;
+      renderLiveStatus(v);
     }, err => {
       console.warn('liveStatus 구독 실패', err);
       renderLiveStatus({});
@@ -3424,6 +3472,17 @@
         const titleEl = el.querySelector('.lvtitle');
         const metaEl = el.querySelector('.lvmeta');
         const viewersEl = el.querySelector('.lvviewers');
+        /* 폴백 링크 href 업데이트 (videoId 우선, 없으면 채널 라이브 페이지) */
+        const fbLink = el.querySelector('.lvfblink');
+        if (fbLink) {
+          if (data && data.videoId) {
+            fbLink.href = `https://www.youtube.com/watch?v=${data.videoId}`;
+          } else if (ch.handle) {
+            fbLink.href = `https://www.youtube.com/@${ch.handle}/live`;
+          } else if (ch.cid) {
+            fbLink.href = `https://www.youtube.com/channel/${ch.cid}/live`;
+          }
+        }
         if (data) {
           liveCount++;
           if (titleEl) {
@@ -3463,6 +3522,9 @@
     onValue(ref(db, 'liveStatusMeta/liveInfo'), snap => {
       currentLiveInfo = snap.val() || {};
       renderLiveInfo();
+      /* liveInfo가 업데이트되면 iframe src도 재평가 (videoId 사용 위해) */
+      const statusSnap = (window.__lastLiveStatus) || {};
+      renderLiveStatus(statusSnap);
     }, err => console.warn('liveInfo 구독 실패', err));
     /* 1분마다 "N분 전 시작" 텍스트 갱신 */
     setInterval(renderLiveInfo, 60000);

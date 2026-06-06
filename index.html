@@ -2156,6 +2156,55 @@
     }
 
     /* === 라이브 채널 자동 표시 === */
+    .lv-total {
+      background: linear-gradient(135deg, rgba(255, 32, 48, .08), rgba(255, 213, 74, .08));
+      border: 1px solid rgba(255, 213, 74, .4);
+      border-radius: 12px;
+      padding: 14px 18px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      color: var(--text);
+      box-shadow: 0 4px 12px rgba(255, 32, 48, .1)
+    }
+    .lv-total b {
+      color: var(--gold);
+      font-size: 18px;
+      font-variant-numeric: tabular-nums
+    }
+    .lvviewers {
+      display: inline-block;
+      background: rgba(255, 32, 48, .14);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-left: 6px;
+      font-variant-numeric: tabular-nums
+    }
+    .lvtitle {
+      padding: 10px 14px;
+      background: rgba(255, 213, 74, .06);
+      border-left: 3px solid var(--gold);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.45;
+      margin: 6px 0
+    }
+    .lvmeta {
+      padding: 4px 14px 8px;
+      color: var(--sub);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .2px
+    }
+    .lvmeta.fresh {
+      color: var(--accent);
+      font-weight: 800
+    }
     .lvon {
       display: inline-block;
       background: var(--accent);
@@ -2604,28 +2653,40 @@
       <h2 class="reveal">📺 <span class="em">실시간</span> 방송</h2>
       <p class="lead reveal" style="--delay:.06s">🔴 <b style="color:var(--gold)">라이브 자동 감지 중</b> · 라이브 중인 채널만 표시됩니다 · 마지막 확인 <b id="liveCheckTime" style="color:var(--accent);font-variant-numeric:tabular-nums">--:--</b></p>
 
+      <div class="lv-total reveal" id="liveTotalViewers" hidden></div>
+
       <div class="livetv reveal lv-toggle" style="--delay:.04s" id="live-hwang" data-key="hwang" data-cid="UCnacnZiUscX6jrVKu78Notg" data-name="황교안TV">
-        <div class="lvlabel">📡 황교안TV <span class="lvsub">@Hwang_Kyo-ahn_TV</span> <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvlabel">📡 황교안TV <span class="lvsub">@Hwang_Kyo-ahn_TV</span> <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.07s" id="live-hangil" data-key="hangil" data-cid="UC_iT-dQV96rPviS4G4p5b9A" data-name="한길뉴스">
-        <div class="lvlabel">📡 한길뉴스 <span class="lvsub">@1waynews-jhg</span> <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvlabel">📡 한길뉴스 <span class="lvsub">@1waynews-jhg</span> <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.1s" id="live-freeuniv" data-key="freeuniv" data-cid="UCCnkoO8v5K8B2_AUjbtKlYQ" data-name="자유대학">
-        <div class="lvlabel">📡 자유대학 <span class="lvsub">현장 촬영 · @Freeuniv0116</span> <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvlabel">📡 자유대학 <span class="lvsub">현장 촬영 · @Freeuniv0116</span> <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.13s" id="live-elonmusk" data-key="elonmusk" data-cid="UCWS0tefWL5UpQsZI2yc8ASg" data-name="일론머스크">
-        <div class="lvlabel">📡 일론머스크 <span class="lvsub">@elongmuskkk</span> <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvlabel">📡 일론머스크 <span class="lvsub">@elongmuskkk</span> <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
       </div>
 
       <div class="livetv reveal lv-toggle" style="--delay:.16s" id="live-knl" data-key="knl" data-cid="UC2vZ-y5LAIaqJt5aIp9o-Tg" data-name="Korea Narrative Live">
-        <div class="lvlabel">📡 Korea Narrative Live <span class="lvon">🔴 LIVE</span></div>
+        <div class="lvlabel">📡 Korea Narrative Live <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
         <div class="lvbox"></div>
       </div>
 
@@ -3295,6 +3356,75 @@
       renderLiveStatus({});
     });
 
+    /* === 라이브 상세 정보 (제목·시청자·시작 시간) === */
+    let currentLiveInfo = {};
+    function fmtLiveStartTime(startMs) {
+      if (!startMs) return '';
+      const elapsed = Date.now() - startMs;
+      const mins = Math.floor(elapsed / 60000);
+      if (mins < 0) return '🔥 곧 시작!';
+      if (mins < 10) return '🔥 방금 시작! · ' + mins + '분 전';
+      if (mins < 60) return '⏱️ ' + mins + '분 전 시작';
+      const hrs = Math.floor(mins / 60);
+      const rem = mins % 60;
+      if (hrs < 24) return '⏱️ ' + hrs + '시간 ' + rem + '분 전 시작';
+      const days = Math.floor(hrs / 24);
+      return '⏱️ ' + days + '일 ' + (hrs % 24) + '시간 전 시작';
+    }
+    function renderLiveInfo() {
+      const info = currentLiveInfo || {};
+      let totalViewers = 0;
+      let liveCount = 0;
+      LIVE_CHANNELS.forEach(ch => {
+        const el = document.getElementById(`live-${ch.key}`);
+        if (!el) return;
+        const data = info[ch.key];
+        const titleEl = el.querySelector('.lvtitle');
+        const metaEl = el.querySelector('.lvmeta');
+        const viewersEl = el.querySelector('.lvviewers');
+        if (data) {
+          liveCount++;
+          if (titleEl) {
+            if (data.title) { titleEl.textContent = '🎬 ' + data.title; titleEl.hidden = false; }
+            else titleEl.hidden = true;
+          }
+          if (metaEl) {
+            const txt = fmtLiveStartTime(data.startTime);
+            if (txt) {
+              metaEl.textContent = txt;
+              metaEl.classList.toggle('fresh', txt.includes('방금'));
+              metaEl.hidden = false;
+            } else metaEl.hidden = true;
+          }
+          if (viewersEl) {
+            if (data.viewers > 0) {
+              viewersEl.textContent = '👁️ ' + data.viewers.toLocaleString('ko-KR');
+              viewersEl.hidden = false;
+              totalViewers += data.viewers;
+            } else viewersEl.hidden = true;
+          }
+        } else {
+          if (titleEl) titleEl.hidden = true;
+          if (metaEl) metaEl.hidden = true;
+          if (viewersEl) viewersEl.hidden = true;
+        }
+      });
+      /* 합산 시청자 카드 */
+      const totalEl = document.getElementById('liveTotalViewers');
+      if (totalEl) {
+        if (totalViewers > 0 && liveCount > 0) {
+          totalEl.innerHTML = `🔥 지금 <b>${totalViewers.toLocaleString('ko-KR')}</b>명이 ${liveCount}개 라이브를 함께 보고 있어요`;
+          totalEl.hidden = false;
+        } else totalEl.hidden = true;
+      }
+    }
+    onValue(ref(db, 'liveStatusMeta/liveInfo'), snap => {
+      currentLiveInfo = snap.val() || {};
+      renderLiveInfo();
+    }, err => console.warn('liveInfo 구독 실패', err));
+    /* 1분마다 "N분 전 시작" 텍스트 갱신 */
+    setInterval(renderLiveInfo, 60000);
+
     /* === YouTube Data API 자동 감지 === */
     const YT_REFRESH_INTERVAL_MS = 5 * 60 * 1000; /* 5분 캐시 */
     let ytTimer = null;
@@ -3323,7 +3453,7 @@
 
     async function ytFetchLiveStreaming(videoIds, apiKey) {
       if (videoIds.length === 0) return [];
-      const url = `https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id=${videoIds.join(',')}&key=${apiKey}`;
+      const url = `https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails,snippet&id=${videoIds.join(',')}&key=${apiKey}`;
       const r = await fetch(url);
       if (!r.ok) throw new Error(`videos.list ${r.status}`);
       const data = await r.json();
@@ -3367,22 +3497,33 @@
         /* 3) 라이브 스트리밍 정보 일괄 조회 */
         const videos = await ytFetchLiveStreaming(allVideoIds, apiKey);
 
-        /* 4) 현재 라이브 중인 채널 판별 */
+        /* 4) 현재 라이브 중인 채널 판별 + 상세 정보 수집 */
         const liveSet = new Set();
         const liveVids = {};
+        const liveInfo = {};
         videos.forEach(v => {
           const ls = v.liveStreamingDetails;
           if (ls && ls.actualStartTime && !ls.actualEndTime) {
             const k = videoToChannel[v.id];
-            if (k) { liveSet.add(k); liveVids[k] = v.id; }
+            if (k) {
+              liveSet.add(k);
+              liveVids[k] = v.id;
+              liveInfo[k] = {
+                videoId: v.id,
+                title: (v.snippet && v.snippet.title) || '',
+                viewers: parseInt(ls.concurrentViewers || '0', 10),
+                startTime: new Date(ls.actualStartTime).getTime()
+              };
+            }
           }
         });
 
-        /* 5) Firebase /liveStatus 업데이트 */
+        /* 5) Firebase /liveStatus + 상세 정보 업데이트 */
         const updates = {};
         LIVE_CHANNELS.forEach(ch => { updates[ch.key] = liveSet.has(ch.key); });
         await set(ref(db, 'liveStatus'), updates);
         await set(ref(db, 'liveStatusMeta/videoIds'), liveVids);
+        await set(ref(db, 'liveStatusMeta/liveInfo'), liveInfo);
         await set(ref(db, 'liveStatusMeta/lastSuccess'), Date.now());
 
         return { ok: true, liveCount: liveSet.size, total: LIVE_CHANNELS.length };

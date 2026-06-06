@@ -2246,37 +2246,28 @@
       display: block;
       width: 100%;
       aspect-ratio: 16/9;
-      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+      background:
+        radial-gradient(ellipse at center, rgba(255, 32, 48, .22) 0%, transparent 60%),
+        linear-gradient(135deg, #150505, #200a0a 50%, #150505);
+      border: 1px solid rgba(255, 32, 48, .35);
       border-radius: 10px;
       overflow: hidden;
       cursor: pointer;
       text-decoration: none;
-      transition: transform .2s ease, box-shadow .2s ease;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
       margin-top: 6px
     }
     .lvthumb:hover {
       transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(255, 32, 48, .35)
+      box-shadow: 0 12px 32px rgba(255, 32, 48, .4);
+      border-color: var(--accent)
     }
-    .lvthumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      background: #000
-    }
-    .lvthumb-img[src=""] { opacity: 0 }
     .lvthumb-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(0, 0, 0, .15) 0%, transparent 35%, transparent 60%, rgba(0, 0, 0, .75) 100%);
       display: flex;
       align-items: center;
-      justify-content: center;
-      transition: background .2s ease
-    }
-    .lvthumb:hover .lvthumb-overlay {
-      background: linear-gradient(180deg, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, .1) 50%, rgba(0, 0, 0, .7) 100%)
+      justify-content: center
     }
     .lvthumb-play {
       width: 64px;
@@ -2793,7 +2784,6 @@
         <div class="lvmeta" hidden></div>
         <div class="lvbox" hidden></div>
         <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
-          <img class="lvthumb-img" alt="" loading="lazy" />
           <div class="lvthumb-overlay">
             <div class="lvthumb-play">▶</div>
           </div>
@@ -2810,7 +2800,6 @@
         <div class="lvmeta" hidden></div>
         <div class="lvbox" hidden></div>
         <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
-          <img class="lvthumb-img" alt="" loading="lazy" />
           <div class="lvthumb-overlay">
             <div class="lvthumb-play">▶</div>
           </div>
@@ -2827,7 +2816,6 @@
         <div class="lvmeta" hidden></div>
         <div class="lvbox" hidden></div>
         <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
-          <img class="lvthumb-img" alt="" loading="lazy" />
           <div class="lvthumb-overlay">
             <div class="lvthumb-play">▶</div>
           </div>
@@ -2844,7 +2832,6 @@
         <div class="lvmeta" hidden></div>
         <div class="lvbox" hidden></div>
         <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
-          <img class="lvthumb-img" alt="" loading="lazy" />
           <div class="lvthumb-overlay">
             <div class="lvthumb-play">▶</div>
           </div>
@@ -2861,7 +2848,6 @@
         <div class="lvmeta" hidden></div>
         <div class="lvbox" hidden></div>
         <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
-          <img class="lvthumb-img" alt="" loading="lazy" />
           <div class="lvthumb-overlay">
             <div class="lvthumb-play">▶</div>
           </div>
@@ -2878,7 +2864,6 @@
         <div class="lvmeta" hidden></div>
         <div class="lvbox" hidden></div>
         <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
-          <img class="lvthumb-img" alt="" loading="lazy" />
           <div class="lvthumb-overlay">
             <div class="lvthumb-play">▶</div>
           </div>
@@ -2895,7 +2880,6 @@
         <div class="lvmeta" hidden></div>
         <div class="lvbox" hidden></div>
         <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
-          <img class="lvthumb-img" alt="" loading="lazy" />
           <div class="lvthumb-overlay">
             <div class="lvthumb-play">▶</div>
           </div>
@@ -2912,7 +2896,22 @@
         <div class="lvmeta" hidden></div>
         <div class="lvbox" hidden></div>
         <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
-          <img class="lvthumb-img" alt="" loading="lazy" />
+          <div class="lvthumb-overlay">
+            <div class="lvthumb-play">▶</div>
+          </div>
+          <div class="lvthumb-info">
+            <span class="lvthumb-badge">🔴 LIVE</span>
+            <span class="lvthumb-cta">YouTube에서 시청 →</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="livetv reveal lv-toggle" style="--delay:.28s" id="live-gonon" data-key="gonon" data-name="고논">
+        <div class="lvlabel">📡 고논 <span class="lvsub">@고논</span> <span class="lvon">🔴 LIVE</span><span class="lvviewers" hidden></span></div>
+        <div class="lvtitle" hidden></div>
+        <div class="lvmeta" hidden></div>
+        <div class="lvbox" hidden></div>
+        <a class="lvthumb" href="#" target="_blank" rel="noopener" hidden>
           <div class="lvthumb-overlay">
             <div class="lvthumb-play">▶</div>
           </div>
@@ -3572,7 +3571,8 @@
       { key: 'knl', cid: 'UC2vZ-y5LAIaqJt5aIp9o-Tg', name: 'Korea Narrative Live', embed: true },
       { key: 'penn1', handle: 'penn1tv', name: '펜앤마이크TV', embed: false },
       { key: 'sisafocus', handle: 'sisafocustv', name: '시사포커스TV', embed: false },
-      { key: 'manggito', cid: 'UC6jYTOc0CbF-rqWxT2q3PBQ', name: '망기토TV', embed: true }
+      { key: 'manggito', cid: 'UC6jYTOc0CbF-rqWxT2q3PBQ', name: '망기토TV', embed: true },
+      { key: 'gonon', handle: '고논', name: '고논', embed: true }
     ];
     function buildIframeHtml(src, name) {
       return `<iframe src="${src}" title="${name} 실시간 방송"
@@ -3660,21 +3660,16 @@
         const titleEl = el.querySelector('.lvtitle');
         const metaEl = el.querySelector('.lvmeta');
         const viewersEl = el.querySelector('.lvviewers');
-        /* 썸네일 카드 링크·이미지 업데이트 */
+        /* 썸네일 카드 링크 업데이트 (이미지는 표시 안 함 — 라이브 미리보기가 stale함) */
         const thumbLink = el.querySelector('.lvthumb');
-        const thumbImg = el.querySelector('.lvthumb-img');
         if (thumbLink) {
           if (data && data.videoId) {
             thumbLink.href = `https://www.youtube.com/watch?v=${data.videoId}`;
           } else if (ch.handle) {
-            thumbLink.href = `https://www.youtube.com/@${ch.handle}/live`;
+            thumbLink.href = `https://www.youtube.com/@${encodeURIComponent(ch.handle)}/live`;
           } else if (ch.cid) {
             thumbLink.href = `https://www.youtube.com/channel/${ch.cid}/live`;
           }
-        }
-        if (thumbImg && data && data.thumbnail) {
-          if (thumbImg.src !== data.thumbnail) thumbImg.src = data.thumbnail;
-          thumbImg.alt = data.title || ch.name;
         }
         if (data) {
           liveCount++;
